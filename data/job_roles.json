@@ -1,0 +1,32 @@
+{
+  "Software Engineer": [
+    "python",
+    "java",
+    "c++",
+    "data structures",
+    "sql",
+    "git"
+  ],
+  "Web Developer": [
+    "html",
+    "css",
+    "javascript",
+    "react",
+    "flask",
+    "sql"
+  ],
+  "Data Analyst": [
+    "python",
+    "sql",
+    "pandas",
+    "numpy",
+    "data analysis"
+  ],
+  "ML Engineer": [
+    "python",
+    "machine learning",
+    "deep learning",
+    "tensorflow",
+    "numpy"
+  ]
+}

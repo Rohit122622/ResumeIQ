@@ -1,0 +1,18 @@
+python
+java
+c
+c++
+machine learning
+deep learning
+data analysis
+sql
+html
+css
+javascript
+flask
+django
+react
+tensorflow
+pandas
+numpy
+git

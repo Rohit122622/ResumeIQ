@@ -1,0 +1,15 @@
+# ─── ResumeIQ Dependencies ───
+# Pinned for reproducible builds
+
+flask==3.1.0
+spacy==3.8.11
+pdfplumber==0.11.8
+reportlab==4.4.7
+authlib==1.6.7
+flask-limiter==4.1.1
+flask-compress==1.23
+flask-wtf==1.2.2
+apscheduler==3.11.2
+sendgrid==6.12.5
+python-dotenv==1.1.0
+gunicorn==23.0.0

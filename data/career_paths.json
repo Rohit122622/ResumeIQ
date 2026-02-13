@@ -1,0 +1,73 @@
+{
+  "Software Engineer": {
+    "skills_to_learn": [
+      "data structures",
+      "algorithms",
+      "system design",
+      "c++"
+    ],
+    "projects": [
+      "Build a REST API using Flask",
+      "Create a full-stack web application",
+      "Implement a mini compiler or interpreter"
+    ],
+    "roadmap": {
+      "month_1": "Master data structures and algorithms",
+      "month_2": "Build backend projects using Flask",
+      "month_3": "Learn system design basics and deploy projects"
+    }
+  },
+
+  "Web Developer": {
+    "skills_to_learn": {
+      "core": ["responsive design", "web accessibility"],
+      "performance": ["browser performance"],
+      "growth": ["seo basics"]
+    },
+    "projects": [
+      "Build a responsive portfolio website",
+      "Create a production-ready React application"
+    ]
+  },
+
+
+
+  "Data Analyst": {
+    "skills_to_learn": [
+      "pandas",
+      "numpy",
+      "data visualization",
+      "statistics"
+    ],
+    "projects": [
+      "Sales data analysis dashboard",
+      "Customer churn analysis",
+      "Exploratory data analysis on real datasets"
+    ],
+    "roadmap": {
+      "month_1": "Learn pandas and numpy deeply",
+      "month_2": "Practice data visualization and EDA",
+      "month_3": "Build end-to-end data analysis projects"
+    }
+  },
+
+  "ML Engineer": {
+    "skills_to_learn": [
+      "machine learning",
+      "deep learning",
+      "model deployment",
+      "tensorflow"
+    ],
+    "projects": [
+      "Build an ML model deployment app",
+      "Create a recommendation system",
+      "Develop an image classification system"
+    ],
+    "roadmap": {
+      "month_1": "Learn ML fundamentals",
+      "month_2": "Implement ML models on datasets",
+      "month_3": "Deploy ML models using Flask"
+    }
+  }
+}
+

@@ -1,0 +1,55 @@
+name: ResumeIQ CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+          python -m spacy download en_core_web_sm
+
+      - name: Lint with flake8 (critical errors only)
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=120
+
+      - name: Import check
+        run: |
+          python -c "from app import app; print('Flask app imports OK')"
+
+      - name: Validate all templates
+        run: |
+          python -c "
+          import jinja2
+          env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
+          templates = [
+              'home.html', 'upload.html', 'result.html', 'history.html',
+              'compare.html', 'compare_result.html', 'resume_builder.html',
+              'resume_preview.html', 'login.html', 'register.html',
+              '404.html', '500.html'
+          ]
+          for t in templates:
+              env.get_template(t)
+          print(f'All {len(templates)} templates parsed OK')
+          "
+
+      - name: Verify cleanup module
+        run: |
+          python -c "from cleanup import cleanup_old_files; print('Cleanup module OK')"
