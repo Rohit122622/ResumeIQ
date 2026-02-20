@@ -11,7 +11,7 @@ from flask import Flask, request, jsonify, render_template, flash
 from flask import send_file, session, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_compress import Compress
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from uuid import uuid4
@@ -35,6 +35,9 @@ from compare_pdf_generator import generate_comparison_pdf
 
 # ── Flask App ──
 app = Flask(__name__)
+
+# ProxyFix: trust X-Forwarded-* headers from reverse proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # SECRET_KEY: require from env in production, fallback only for local dev
 _env = os.getenv("FLASK_ENV", "development")
@@ -73,7 +76,7 @@ error_handler.setFormatter(logging.Formatter(
 app.logger.addHandler(file_handler)
 app.logger.addHandler(error_handler)
 app.logger.setLevel(logging.INFO)
-app.logger.info("ResumeIQ starting up...")
+app.logger.info("Nexus CV starting up...")
 
 # ── Rate Limiting ──
 limiter = Limiter(
@@ -83,10 +86,7 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
-# ── Compression ──
-Compress(app)
-create_users_table()
-create_analysis_table()
+
 
 oauth = OAuth(app)
 
@@ -118,6 +118,8 @@ app.config["REPORT_FOLDER"] = REPORT_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(REPORT_FOLDER, exist_ok=True)
+
+# ── Initialize database tables (once) ──
 create_users_table()
 create_analysis_table()
 
@@ -348,7 +350,7 @@ def compare_analyze():
         send_email(
             session["email"],
             cmp_pdf_path,
-            subject="Your Resume Comparison Report \u2014 ResumeIQ",
+            subject="Your Resume Comparison Report \u2014 Nexus CV",
             body=(
                 f"Hello,\n\n"
                 f"Your resume comparison report for the {role} role is attached.\n\n"
@@ -356,7 +358,7 @@ def compare_analyze():
                 f"{change_msg}\n\n"
                 f"Review the attached PDF for full details on skills added, "
                 f"removed, and overall improvement.\n\n"
-                f"Best regards,\nResumeIQ Team"
+                f"Best regards,\nNexus CV Team"
             ),
             attachment_name="Resume_Comparison_Report.pdf"
         )
@@ -439,6 +441,12 @@ def download_history_pdf():
 
     if not pdf_path or not os.path.exists(pdf_path):
         return "File not found", 404
+
+    # Security: prevent path traversal — only serve files from REPORT_FOLDER
+    real_path = os.path.realpath(pdf_path)
+    real_report_dir = os.path.realpath(app.config["REPORT_FOLDER"])
+    if not real_path.startswith(real_report_dir):
+        return "Access denied", 403
 
     return send_file(pdf_path, as_attachment=True)
 
@@ -603,15 +611,15 @@ def generate_resume():
         send_email(
             session["email"],
             pdf_path,
-            subject="Your Generated Resume \u2014 ResumeIQ",
+            subject="Your Generated Resume \u2014 Nexus CV",
             body=(
                 f"Hello {resume_data.get('full_name', '')},\n\n"
                 f"Your resume has been generated and optimized for the "
                 f"{target_role} role.\n\n"
                 f"ATS Score: {ats_result['ats_score']}\n\n"
                 f"Your resume PDF is attached. You can also download it "
-                f"from your ResumeIQ dashboard.\n\n"
-                f"Best regards,\nResumeIQ Team"
+                f"from your Nexus CV dashboard.\n\n"
+                f"Best regards,\nNexus CV Team"
             ),
             attachment_name="Generated_Resume.pdf"
         )
@@ -701,11 +709,11 @@ def set_security_headers(response):
             "img-src 'self' data:; "
             "connect-src 'self'"
         )
-    # Cache static assets
-    if response.content_type and "text/css" in response.content_type:
-        response.headers["Cache-Control"] = "public, max-age=86400"
-    elif response.content_type and "javascript" in response.content_type:
-        response.headers["Cache-Control"] = "public, max-age=86400"
+    # Cache static assets (CSS, JS, images, fonts)
+    if response.content_type:
+        ct = response.content_type
+        if any(t in ct for t in ["text/css", "javascript", "image/", "font/"]):
+            response.headers["Cache-Control"] = "public, max-age=86400"
     return response
 
 
@@ -744,7 +752,7 @@ def _start_cleanup_scheduler():
             cleanup_old_files,
             "interval",
             hours=6,
-            id="resumeiq_cleanup",
+            id="nexuscv_cleanup",
             replace_existing=True
         )
         scheduler.start()
@@ -759,5 +767,4 @@ def _start_cleanup_scheduler():
 
 if __name__ == "__main__":
     _start_cleanup_scheduler()
-    port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)

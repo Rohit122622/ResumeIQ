@@ -1,269 +1,192 @@
 <p align="center">
-  <img src="static/favicon.svg" alt="ResumeIQ Logo" width="80" height="80">
-  <h1 align="center">ResumeIQ</h1>
-  <p align="center">
-    <strong>AI-Powered Resume Analysis, Building & Career Intelligence Platform</strong>
-  </p>
-  <p align="center">
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
-    <a href="#installation">Installation</a> •
-    <a href="#deployment">Deployment</a> •
-    <a href="#license">License</a>
-  </p>
+  <img src="static/favicon.svg" alt="Nexus CV Logo" width="80" height="80">
+  <h1 align="center">Nexus CV</h1>
+  <p align="center"><em>AI-Powered Resume Analysis & Career Intelligence Platform</em></p>
 </p>
 
 ---
 
-> **Live Demo:** _Coming soon_
-
 ## Overview
 
-ResumeIQ is a full-stack AI-powered resume intelligence platform that analyzes resumes for ATS compatibility, generates career roadmaps, builds interview-ready resumes, and compares resume versions — all from a modern, responsive web interface.
+**Nexus CV** is a full-stack AI-powered resume intelligence platform that analyzes resumes for ATS compatibility, generates career roadmaps, builds interview-ready resumes, and compares resume versions — all from a modern, responsive web interface.
 
-Built as a production-grade Flask SaaS application with security hardening, email automation, and deployment infrastructure included.
+Built with Flask, spaCy NLP, scikit-learn ML, and ReportLab PDF generation, Nexus CV demonstrates production-grade architecture patterns including OAuth 2.0, CSRF protection, rate limiting, background job scheduling, and automated email delivery.
 
 ---
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| 🎯 **ATS Scoring Engine** | Scores resumes against job descriptions using NLP-based keyword matching and formatting analysis |
-| 📝 **AI Resume Builder** | Multi-section form that generates ATS-optimized, recruiter-friendly PDFs with AI refinement |
-| 🔄 **Resume Comparison** | Upload two versions of a resume to track ATS improvement with side-by-side scoring and charts |
-| 📧 **Email Automation** | SendGrid API with SMTP fallback — automatically emails analysis reports as PDF attachments |
-| 🗺️ **Dynamic Career Roadmap** | Predicts career paths, recommends skills, and generates personalized upskilling guides |
-| 📊 **PDF Report Generation** | Professionally formatted PDF reports with scores, charts, and actionable insights |
-| 🔒 **Security Hardening** | CSRF protection, rate limiting, session security, Content Security Policy headers |
-| 🚀 **Production Ready** | Gunicorn config, Nginx reverse proxy, CI/CD pipeline, environment-based configuration |
+| Module | Description |
+|---|---|
+| **Resume Analysis** | Upload a PDF resume → get ATS score, skill detection, role prediction, and AI improvement suggestions |
+| **AI Resume Builder** | Fill in your details → get a professionally formatted, ATS-optimized PDF resume |
+| **Resume Comparison** | Upload two resume versions → see ATS score diff, skills added/removed, and AI insight |
+| **Career Roadmap** | Personalized 6-month learning plan based on detected skill gaps |
+| **Job Description Match** | Paste a JD → get match percentage, matched/missing keywords |
+| **Email Reports** | Auto-email PDF reports via SendGrid with SMTP fallback |
+| **Auth System** | Local register/login + Google & Microsoft OAuth 2.0 |
+| **Analysis History** | Track past analyses with downloadable PDF reports |
 
 ---
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|------------|
-| **Backend** | Python 3.10+, Flask 3.1 |
-| **NLP** | spaCy (skill extraction, text analysis) |
+|---|---|
+| **Backend** | Python 3.x, Flask, Jinja2 |
+| **NLP** | spaCy (`en_core_web_sm`) |
+| **ML** | scikit-learn, joblib, numpy |
 | **PDF** | ReportLab (generation), pdfplumber (parsing) |
-| **Auth** | Authlib (Google OAuth, Microsoft OAuth), Flask sessions |
-| **Email** | SendGrid API, Gmail SMTP fallback |
-| **Security** | Flask-WTF (CSRF), Flask-Limiter (rate limiting), Flask-Compress (gzip) |
-| **Database** | SQLite (users, analysis history) |
-| **Frontend** | Vanilla HTML/CSS/JS, Chart.js, responsive design |
-| **Deploy** | Gunicorn, Nginx, GitHub Actions CI/CD |
+| **Database** | SQLite via SQLAlchemy |
+| **Auth** | Authlib (Google + Microsoft OAuth 2.0) |
+| **Email** | SendGrid API + SMTP fallback |
+| **Security** | Flask-WTF CSRF, Flask-Limiter, security headers |
+| **Scheduling** | APScheduler (background file cleanup) |
+| **Frontend** | Responsive HTML/CSS/JS with dark mode support |
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                     Nginx (443/80)                   │
-│              Reverse Proxy + SSL + Static            │
-└──────────────────────┬──────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────┐
-│               Gunicorn (WSGI Server)                 │
-│              Workers: 2 × CPU + 1                    │
-└──────────────────────┬──────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────┐
-│                  Flask Application                   │
-│  ┌─────────┐ ┌──────────┐ ┌───────────┐ ┌────────┐ │
-│  │ Analyze │ │ Compare  │ │  Builder  │ │  Auth  │ │
-│  └────┬────┘ └────┬─────┘ └─────┬─────┘ └────┬───┘ │
-│       │           │             │             │      │
-│  ┌────▼───────────▼─────────────▼─────────────▼───┐ │
-│  │   spaCy NLP · ATS Scorer · PDF Generator       │ │
-│  │   Career Recommender · Email Sender             │ │
-│  └─────────────────────────────────────────────────┘ │
-└──────────────────────┬──────────────────────────────┘
-                       │
-              ┌────────▼────────┐
-              │  SQLite (users.db) │
-              └─────────────────┘
+┌─────────────────────────────────────────────────┐
+│                    Client                       │
+│          (Browser — HTML/CSS/JS)                │
+└───────────────────┬─────────────────────────────┘
+                    │ HTTP
+┌───────────────────▼─────────────────────────────┐
+│              Flask Application                  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────────┐ │
+│  │  Auth    │ │  CSRF    │ │  Rate Limiter    │ │
+│  └──────────┘ └──────────┘ └──────────────────┘ │
+│  ┌──────────────────────────────────────────┐   │
+│  │           Route Handlers                 │   │
+│  │  /analyze  /compare  /resume-builder     │   │
+│  └──────────────────────────────────────────┘   │
+│  ┌──────────┐ ┌──────────┐ ┌────────────────┐  │
+│  │  spaCy   │ │ sklearn  │ │  ReportLab     │  │
+│  │  NLP     │ │ ML Model │ │  PDF Engine    │  │
+│  └──────────┘ └──────────┘ └────────────────┘  │
+│  ┌──────────┐ ┌──────────┐ ┌────────────────┐  │
+│  │ SQLite   │ │ SendGrid │ │  APScheduler   │  │
+│  │ Database │ │ Email    │ │  Cleanup Jobs  │  │
+│  └──────────┘ └──────────┘ └────────────────┘  │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Folder Structure
+## How It Works
 
-```
-AI_Resume_Analyzer/
-├── app.py                      # Main Flask application (routes, middleware, config)
-├── database.py                 # SQLite connection and table creation
-├── resume_parser.py            # PDF resume text extraction
-├── skill_matcher.py            # NLP-based skill matching
-├── ats_scorer.py               # ATS compatibility scoring engine
-├── role_predictor.py           # ML-based role prediction
-├── multi_role_predictor.py     # Multi-role career prediction
-├── career_recommender.py       # Career path and roadmap generation
-├── jd_matcher.py               # Job description matching
-├── resume_builder.py           # AI resume builder logic and PDF generation
-├── resume_insights.py          # Resume quality insights
-├── resume_suggestions.py       # Improvement suggestions engine
-├── pdf_generator.py            # Analysis report PDF generation
-├── pdf_utils.py                # PDF helper utilities
-├── compare_pdf_generator.py    # Comparison report PDF generation
-├── email_sender.py             # SendGrid + SMTP email sender
-├── cleanup.py                  # Scheduled file cleanup (APScheduler)
-├── train_model.py              # ML model training script
-├── gunicorn_config.py          # Gunicorn production configuration
-├── nginx.conf                  # Nginx reverse proxy configuration
-├── requirements.txt            # Pinned Python dependencies
-├── .env.example                # Environment variable template
-├── .gitignore                  # Git ignore rules
-│
-├── templates/                  # Jinja2 HTML templates (12 pages)
-│   ├── home.html
-│   ├── login.html / register.html
-│   ├── upload.html / result.html
-│   ├── compare.html / compare_result.html
-│   ├── resume_builder.html / resume_preview.html
-│   ├── history.html
-│   └── 404.html / 500.html
-│
-├── static/                     # CSS, JS, SVG assets
-│   ├── style.css               # Full design system (dark/light modes)
-│   ├── script.js / theme.js
-│   └── favicon.svg / google.svg / resumeiq-logo.svg
-│
-├── data/                       # Static reference data
-│   ├── skills.txt
-│   ├── job_roles.json
-│   └── career_paths.json
-│
-├── model/                      # Pre-trained ML models
-│   ├── role_model.pkl
-│   └── vectorizer.pkl
-│
-└── .github/workflows/
-    └── deploy.yml              # CI/CD pipeline
-```
+### Resume Analysis
+1. User uploads a PDF resume
+2. **pdfplumber** extracts raw text
+3. **spaCy** performs NLP entity/skill extraction
+4. **scikit-learn** model predicts the best-fit job role
+5. **ATS Scorer** calculates a composite score (skills match + keyword coverage + completeness)
+6. **Career Recommender** generates a personalized 6-month roadmap
+7. **ReportLab** generates a professional PDF report
+8. Report is auto-emailed to the user
+
+### Resume Builder
+1. User fills in structured form data (education, experience, skills, projects)
+2. Engine validates and formats the data
+3. **ATS Refiner** iteratively optimizes for the target role
+4. Professional PDF generated with score summary
+
+### Resume Comparison
+1. User uploads two resume versions
+2. Both are independently analyzed for ATS scoring
+3. Diff engine identifies skills added/removed and score changes
+4. AI generates a contextual insight summary
 
 ---
 
 ## Installation
 
 ### Prerequisites
-
-- Python 3.10 or higher
+- Python 3.10+
 - pip
 
-### Local Setup
-
+### Setup
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/yourusername/AI_Resume_Analyzer.git
 cd AI_Resume_Analyzer
 
-# 2. Create a virtual environment
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate        # Linux/Mac
-venv\Scripts\activate           # Windows
 
-# 3. Install dependencies
+# Activate (Windows)
+venv\Scripts\activate
+
+# Activate (macOS/Linux)
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# 4. Download spaCy language model
+# Download spaCy model
 python -m spacy download en_core_web_sm
 
-# 5. Set up environment variables
+# Copy environment config
 cp .env.example .env
-# Edit .env with your actual credentials
+# Edit .env and add your keys (SECRET_KEY, SendGrid, OAuth, etc.)
 
-# 6. Run the application
+# Run the application
 python app.py
 ```
 
-The app will be available at `http://localhost:5000`.
+The app will be available at `http://localhost:5000`
 
 ---
 
-## Environment Variables
+## Project Structure
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SECRET_KEY` | **Yes** (prod) | Flask session encryption key. **Must be set in production.** |
-| `FLASK_ENV` | No | `development` (default) or `production` |
-| `PORT` | No | Server port (default: `5000`) |
-| `SENDGRID_API_KEY` | No | SendGrid API key for email delivery |
-| `SENDGRID_FROM_EMAIL` | No | Sender email for SendGrid |
-| `EMAIL_USER` | No | Gmail address for SMTP fallback |
-| `EMAIL_PASS` | No | Gmail app password for SMTP fallback |
-| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
-| `MICROSOFT_CLIENT_ID` | No | Microsoft OAuth client ID |
-| `MICROSOFT_CLIENT_SECRET` | No | Microsoft OAuth client secret |
-
----
-
-## Deployment
-
-### Production (Gunicorn + Nginx)
-
-```bash
-# 1. Install production dependencies
-pip install -r requirements.txt
-
-# 2. Configure environment
-cp .env.example .env
-# Set SECRET_KEY, FLASK_ENV=production, and other secrets
-
-# 3. Start Gunicorn
-gunicorn -c gunicorn_config.py app:app
-
-# 4. Configure Nginx
-# Copy nginx.conf to /etc/nginx/sites-available/
-# Update server_name and SSL certificate paths
-# Enable the site and reload Nginx
 ```
-
-### Render / Cloud Platforms
-
-The app reads `PORT` from environment automatically:
-
-```python
-port = int(os.getenv("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+AI_Resume_Analyzer/
+├── app.py                    # Main Flask application & routes
+├── resume_parser.py          # PDF text extraction
+├── skill_matcher.py          # Skill matching engine
+├── role_predictor.py         # ML role prediction
+├── multi_role_predictor.py   # Multi-role ranking
+├── ats_scorer.py             # ATS score calculator
+├── career_recommender.py     # Career roadmap generator
+├── jd_matcher.py             # Job description matcher
+├── resume_insights.py        # Resume quality analysis
+├── resume_suggestions.py     # AI improvement suggestions
+├── resume_builder.py         # AI resume builder + PDF
+├── pdf_generator.py          # Analysis report PDF
+├── compare_pdf_generator.py  # Comparison report PDF
+├── pdf_utils.py              # Shared PDF utilities
+├── email_sender.py           # SendGrid + SMTP email
+├── database.py               # SQLite database layer
+├── cleanup.py                # Scheduled file cleanup
+├── train_model.py            # ML model training script
+├── templates/                # Jinja2 HTML templates
+├── static/                   # CSS, JS, SVG assets
+├── model/                    # Trained ML model files
+├── data/                     # Training datasets
+├── requirements.txt          # Python dependencies
+└── .env.example              # Environment config template
 ```
-
-Gunicorn entry point: `app:app`
-
----
-
-## Security Highlights
-
-- **CSRF Protection** — All POST forms protected via Flask-WTF `CSRFProtect`
-- **Rate Limiting** — `/analyze` (10/min), `/generate-resume` (5/min), `/compare-analyze` (5/min)
-- **Session Security** — `HttpOnly`, `SameSite=Lax`, `Secure` (production)
-- **Security Headers** — `X-Frame-Options`, `X-Content-Type-Options`, `CSP`, `HSTS`
-- **Secret Management** — Environment variables via `.env`, no hardcoded secrets
-- **File Cleanup** — Automated deletion of old uploads and reports (APScheduler)
-- **Error Handling** — Custom 404/500 pages, no traceback leaks in production
 
 ---
 
 ## Screenshots
 
-> _Screenshots coming soon_
-
-<!-- 
-![Home Page](screenshots/home.png)
-![Analysis Result](screenshots/result.png)
-![Resume Builder](screenshots/builder.png)
--->
+> _Screenshots coming soon._
 
 ---
 
-## License
+## Author
 
-This project is licensed under the [MIT License](LICENSE).
+**Rohit**
+
+Built as an advanced AI/ML portfolio project demonstrating full-stack development, NLP, machine learning, and production-grade architecture patterns.
 
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Rohit</strong>
+  <sub>Built with ❤️ using Flask, spaCy, scikit-learn & ReportLab</sub>
 </p>

@@ -1,5 +1,5 @@
 """
-Automatic file cleanup for ResumeIQ production environment.
+Automatic file cleanup for Nexus CV.
 Deletes old reports and uploads to prevent disk bloat.
 Can be run standalone (cron) or via APScheduler background job.
 """

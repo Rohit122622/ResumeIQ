@@ -1,5 +1,5 @@
 """
-Email sender for ResumeIQ.
+Email sender for Nexus CV.
 Supports SendGrid API (preferred) with SMTP fallback.
 """
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # ── SendGrid (preferred) ──
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-SENDGRID_FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL", "noreply@resumeiq.com")
+SENDGRID_FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL", "noreply@nexuscv.com")
 
 # ── SMTP fallback ──
 EMAIL_USER = os.getenv("EMAIL_USER")
@@ -95,7 +95,7 @@ def send_email(to_email, pdf_path, subject=None, body=None, attachment_name=None
         body = (
             "Hello,\n\n"
             "Your resume analysis report is attached.\n\n"
-            "Thank you for using ResumeIQ.\n"
+            "Thank you for using Nexus CV.\n"
         )
     if attachment_name is None:
         attachment_name = "Resume_Analysis_Report.pdf"

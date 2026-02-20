@@ -1,5 +1,5 @@
 """
-Shared PDF utility functions for ResumeIQ.
+Shared PDF utility functions for Nexus CV.
 Used by both pdf_generator.py (analysis reports) and resume_builder.py (generated resumes).
 """
 

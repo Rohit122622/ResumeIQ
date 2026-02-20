@@ -1,5 +1,5 @@
 """
-AI Resume Builder module for ResumeIQ.
+AI Resume Builder module for Nexus CV.
 Handles form validation, resume data formatting, ATS refinement, and PDF generation.
 """
 
