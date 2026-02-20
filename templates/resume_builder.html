@@ -22,8 +22,9 @@
     <!-- NAVBAR -->
     <nav class="navbar">
         <button onclick="toggleTheme()" class="btn outline">🌙</button>
-        <div>
-            <span class="brand-main">Resume</span><span class="brand-accent">IQ</span>
+        <div class="brand">
+            <img src="{{ url_for('static', filename='nexuscv-logo.svg') }}" class="brand-logo" alt="Nexus CV">
+            <span class="brand-text">Nexus CV</span>
         </div>
 
         {% if session.get("user") %}
@@ -54,9 +55,18 @@
     {% if messages %}
     <div class="container" style="margin-top:10px; margin-bottom:-20px;">
         {% for category, message in messages %}
-        <div class="flash-message flash-{{ category }}">
-            ⚠️ {{ message }}
+        {% if category == 'error' %}
+        <div class="validation-error-card">
+            <span class="error-icon">⚠️</span>
+            <div class="error-title">Input Validation Error</div>
+            <p class="error-message">{{ message }}</p>
+            <p class="error-hint">Please fix the issue above and try again.</p>
         </div>
+        {% else %}
+        <div class="flash-message flash-{{ category }}">
+            {{ message }}
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}

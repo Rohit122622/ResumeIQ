@@ -46,6 +46,21 @@
     </nav>
 
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if category == 'error' %}
+        <div class="validation-error-card">
+            <span class="error-icon">⚠️</span>
+            <div class="error-title">Input Validation Error</div>
+            <p class="error-message">{{ message }}</p>
+            <p class="error-hint">Please fix the issue above and try again.</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         <h1>AI Resume Analyzer</h1>
         <p>Upload your resume to get ATS score and career guidance</p>
 

@@ -23,7 +23,8 @@
     <nav class="navbar">
         <button onclick="toggleTheme()" class="btn outline">🌙</button>
         <div class="brand">
-            <span class="brand-main">Resume</span><span class="brand-accent">IQ</span>
+            <img src="{{ url_for('static', filename='nexuscv-logo.svg') }}" class="brand-logo" alt="Nexus CV">
+            <span class="brand-text">Nexus CV</span>
         </div>
 
         {% if session.get("user") %}
@@ -51,6 +52,25 @@
 
 
     <div class="container">
+
+        {% if validation_summary %}
+        <div class="validation-summary">
+            <div class="vs-item">
+                <span class="vs-check">✔</span> Resume structure detected
+            </div>
+            <div class="vs-item">
+                <span class="vs-check">✔</span> Sections found: {{ validation_summary.sections_found | join(", ") }}
+            </div>
+            {% if validation_summary.jd_detected %}
+            <div class="vs-item">
+                <span class="vs-check">✔</span> Job description validated
+            </div>
+            {% endif %}
+            <div class="vs-item">
+                <span class="vs-check">✔</span> Content quality score: {{ validation_summary.quality_score }}%
+            </div>
+        </div>
+        {% endif %}
 
         <h1>Resume Analysis Dashboard</h1>
 

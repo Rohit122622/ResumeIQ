@@ -21,8 +21,9 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <button onclick="toggleTheme()" class="btn outline">🌙</button>
-    <div>
-      <span class="brand-main">Resume</span><span class="brand-accent">IQ</span>
+    <div class="brand">
+      <img src="{{ url_for('static', filename='nexuscv-logo.svg') }}" class="brand-logo" alt="Nexus CV">
+      <span class="brand-text">Nexus CV</span>
     </div>
 
     {% if session.get("user") %}

@@ -39,7 +39,7 @@ def sanitize_input(text):
 
 def validate_form_data(form):
     """
-    Server-side validation of resume builder form.
+    Server-side validation of resume builder form (strict mode).
     Returns (is_valid: bool, error_message: str)
     """
     required_fields = {
@@ -54,18 +54,26 @@ def validate_form_data(form):
         if not value:
             return False, f"{label} is required."
 
-    # Skills check
+    # ── Career objective minimum length ──
+    objective = form.get("career_objective", "").strip()
+    if len(objective) < 30:
+        return False, "Career Objective must be at least 30 characters long."
+
+    # ── Skills check (minimum 3) ──
     skills = form.get("skills", "").strip()
     if not skills:
         return False, "At least one skill is required."
+    skills_list = [s.strip() for s in skills.split(",") if s.strip()]
+    if len(skills_list) < 3:
+        return False, "At least 3 skills are required for a competitive resume."
 
-    # Education check
+    # ── Education check ──
     edu_degrees = form.getlist("edu_degree[]")
     has_education = any(d.strip() for d in edu_degrees)
     if not has_education:
         return False, "At least one education entry is required."
 
-    # Experience OR Project check
+    # ── Experience OR Project check ──
     exp_titles = form.getlist("exp_title[]")
     proj_names = form.getlist("proj_name[]")
     has_experience = any(t.strip() for t in exp_titles)
@@ -74,7 +82,35 @@ def validate_form_data(form):
     if not has_experience and not has_projects:
         return False, "At least one Work Experience or Project is required."
 
+    # ── Empty bullet point check ──
+    exp_descriptions = form.getlist("exp_description[]")
+    proj_descriptions = form.getlist("proj_description[]")
+    all_bullets = exp_descriptions + proj_descriptions
+
+    for i, desc in enumerate(all_bullets):
+        if desc is not None:
+            lines = [line.strip() for line in desc.strip().split("\n") if line.strip() != ""]
+            for line in lines:
+                cleaned = line.lstrip("•-▪▸◦★✦✓✔➤► ").strip()
+                if not cleaned:
+                    return False, "Empty bullet points are not allowed. Please remove or fill them."
+
+    # ── Duplicate sentence check ──
+    all_text_fields = [objective] + list(exp_descriptions) + list(proj_descriptions)
+    seen_sentences = set()
+    for text in all_text_fields:
+        if not text:
+            continue
+        sentences = [s.strip().lower() for s in text.strip().split("\n") if s.strip()]
+        for sentence in sentences:
+            cleaned = sentence.lstrip("•-▪▸◦★✦✓✔➤► ").strip()
+            if len(cleaned) > 15:  # Only check substantial sentences
+                if cleaned in seen_sentences:
+                    return False, f"Duplicate sentence detected: \"{sentence[:60]}...\". Each description must be unique."
+                seen_sentences.add(cleaned)
+
     return True, ""
+
 
 
 # ────────────── DATA FORMATTING ──────────────

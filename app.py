@@ -31,6 +31,7 @@ from resume_insights import analyze_resume_insights
 from resume_suggestions import generate_suggestions
 from multi_role_predictor import predict_multiple_roles
 from compare_pdf_generator import generate_comparison_pdf
+from input_validator import validate_resume_text, validate_job_description, validate_content_quality
 
 
 # ── Flask App ──
@@ -142,13 +143,56 @@ def upload_page():
 def analyze():
     if "user" not in session:
         return redirect("/login")
-    
+
     file = request.files["resume"]
+
+    # ── File type validation ──
+    if not file.filename.lower().endswith(".pdf"):
+        flash("Only PDF resume files are allowed.", "error")
+        return redirect("/upload-page")
+
+    # ── File size validation (5 MB limit) ──
+    file.seek(0, 2)
+    file_size = file.tell()
+    file.seek(0)
+    if file_size > 5 * 1024 * 1024:
+        flash("File size must be under 5 MB.", "error")
+        return redirect("/upload-page")
+
     path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
     file.save(path)
 
     parsed_data = parse_resume(path)
     resume_text = parsed_data["text"]
+
+    # ── Resume text validation ──
+    is_valid_resume, resume_err = validate_resume_text(resume_text)
+    if not is_valid_resume:
+        flash(resume_err, "error")
+        return redirect("/upload-page")
+
+    # ── Content quality validation ──
+    quality = validate_content_quality(resume_text)
+    if not quality["is_valid"]:
+        flash(quality["reason"], "error")
+        return redirect("/upload-page")
+
+    # ── JD validation (if provided) ──
+    job_description = request.form.get("job_description", None)
+    if job_description:
+        jd_valid, jd_err = validate_job_description(job_description)
+        if not jd_valid:
+            flash(jd_err, "error")
+            return redirect("/upload-page")
+
+    # ── Build validation summary ──
+    validation_summary = {
+        "resume_detected": True,
+        "sections_found": quality["sections_found"],
+        "jd_detected": bool(job_description),
+        "quality_score": quality["confidence_score"]
+    }
+
     insights = analyze_resume_insights(resume_text, parsed_data["skills"])
     # MULTI-ROLE PREDICTION
     multi_roles = predict_multiple_roles(parsed_data["skills"])
@@ -161,7 +205,6 @@ def analyze():
         "matched_skills": [],
         "missing_keywords": []
     }
-    job_description = request.form.get("job_description", None)
     if job_description:
         jd_result = match_jd(parsed_data["skills"], job_description)
 
@@ -241,7 +284,8 @@ def analyze():
             "skill": ats_result["skill_score"],
             "keyword": ats_result["keyword_score"],
             "completeness": ats_result["completeness_score"]
-        }
+        },
+        validation_summary=validation_summary
     )
 
 @app.route("/compare-analyze", methods=["POST"])
@@ -255,6 +299,18 @@ def compare_analyze():
 
     if not resume1 or not resume2:
         return redirect("/compare-resume")
+
+    # ── File type validation ──
+    for f, label in [(resume1, "Resume V1"), (resume2, "Resume V2")]:
+        if not f.filename.lower().endswith(".pdf"):
+            flash(f"{label}: Only PDF resume files are allowed.", "error")
+            return redirect("/compare-resume")
+        f.seek(0, 2)
+        fsize = f.tell()
+        f.seek(0)
+        if fsize > 5 * 1024 * 1024:
+            flash(f"{label}: File size must be under 5 MB.", "error")
+            return redirect("/compare-resume")
 
     from uuid import uuid4
 
@@ -273,6 +329,17 @@ def compare_analyze():
     parsed1 = parse_resume(path1)
     parsed2 = parse_resume(path2)
 
+    # ── Resume text validation (both files) ──
+    for parsed, label in [(parsed1, "Resume V1"), (parsed2, "Resume V2")]:
+        is_valid, err_msg = validate_resume_text(parsed["text"])
+        if not is_valid:
+            flash(f"{label}: {err_msg}", "error")
+            return redirect("/compare-resume")
+        q_result = validate_content_quality(parsed["text"])
+        if not q_result["is_valid"]:
+            flash(f"{label}: {q_result['reason']}", "error")
+            return redirect("/compare-resume")
+
     role = predict_multiple_roles(parsed2["skills"])[0]["role"]
 
     ats1 = calculate_ats_score(parsed1, role)
@@ -281,7 +348,12 @@ def compare_analyze():
     job_description = request.form.get("job_description")
     jd1 = jd2 = None
 
+    # ── JD validation (if provided) ──
     if job_description:
+        jd_valid, jd_err = validate_job_description(job_description)
+        if not jd_valid:
+            flash(jd_err, "error")
+            return redirect("/compare-resume")
         jd1 = match_jd(parsed1["skills"], job_description)
         jd2 = match_jd(parsed2["skills"], job_description)
 
@@ -766,5 +838,4 @@ def _start_cleanup_scheduler():
 # ------------------------
 
 if __name__ == "__main__":
-    _start_cleanup_scheduler()
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="127.0.0.1", port=5000)

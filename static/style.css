@@ -1200,3 +1200,129 @@ body {
 body.dark ::selection {
     background: rgba(20, 184, 166, 0.25);
 }
+
+/* ======================================================= */
+/* NAVBAR BRAND BLOCK                                       */
+/* ======================================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.brand-logo {
+    height: 32px;
+    width: auto;
+    transition: filter 0.3s ease;
+}
+
+body.dark .brand-logo {
+    filter: drop-shadow(0 0 8px rgba(20, 184, 166, 0.4));
+}
+
+.brand-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark .brand-text {
+    background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px rgba(20, 184, 166, 0.25));
+}
+
+/* ======================================================= */
+/* VALIDATION ERROR CARD                                    */
+/* ======================================================= */
+
+.validation-error-card {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1.5px solid rgba(239, 68, 68, 0.25);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    animation: fadeUpSoft 0.5s ease;
+}
+
+.validation-error-card .error-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.validation-error-card .error-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 8px;
+}
+
+.validation-error-card .error-message {
+    font-size: 14px;
+    opacity: 0.85;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.validation-error-card .error-hint {
+    font-size: 13px;
+    opacity: 0.65;
+    font-style: italic;
+    margin-bottom: 16px;
+}
+
+body.dark .validation-error-card {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+body.dark .validation-error-card .error-title {
+    color: #fca5a5;
+}
+
+/* ======================================================= */
+/* VALIDATION SUMMARY CARD (result page)                    */
+/* ======================================================= */
+
+.validation-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 16px 20px;
+    background: rgba(20, 184, 166, 0.06);
+    border: 1px solid rgba(20, 184, 166, 0.15);
+    border-radius: 14px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    animation: fadeUpSoft 0.4s ease;
+}
+
+.validation-summary .vs-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.validation-summary .vs-check {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+body.dark .validation-summary {
+    background: rgba(20, 184, 166, 0.08);
+    border-color: rgba(20, 184, 166, 0.2);
+}
+
+body.dark .validation-summary .vs-check {
+    color: #4ade80;
+}

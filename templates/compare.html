@@ -20,7 +20,10 @@
 
     <nav class="navbar">
         <button onclick="toggleTheme()" class="btn outline">🌙</button>
-        <div></div>
+        <div class="brand">
+            <img src="{{ url_for('static', filename='nexuscv-logo.svg') }}" class="brand-logo" alt="Nexus CV">
+            <span class="brand-text">Nexus CV</span>
+        </div>
         {% if session.get("user") %}
         <div class="profile">
             <div class="avatar" onclick="toggleMenu()">
@@ -44,6 +47,21 @@
     </nav>
 
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if category == 'error' %}
+        <div class="validation-error-card">
+            <span class="error-icon">⚠️</span>
+            <div class="error-title">Input Validation Error</div>
+            <p class="error-message">{{ message }}</p>
+            <p class="error-hint">Please fix the issue above and try again.</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         <section class="card">
             <h3>Resume Version Comparison</h3>
             <p>Upload two versions of your resume to track improvement</p>
