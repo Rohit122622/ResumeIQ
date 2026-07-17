@@ -312,8 +312,7 @@ Respond ONLY with valid JSON, no markdown:
 
         return result
     except Exception as e:
-        import traceback
-        print(f"Gemini rewrite error: {e}\n{traceback.format_exc()}")
+        logger.error("Gemini rewrite error: %s", e, exc_info=True)
         return {
             "rewritten_bullets": experience_bullets,
             "rewritten_objective": objective,
@@ -485,6 +484,5 @@ Respond ONLY with a valid JSON object matching EXACTLY this structure:
             return [r for r in parsed_gaps if str(r.get("skill", "")).lower() in allowed][:10]
         return parsed_gaps[:10]
     except Exception as e:
-        import traceback
-        print(f"Gemini skill gap error: {e}\n{traceback.format_exc()}")
+        logger.error("Gemini skill gap error: %s", e, exc_info=True)
         return []

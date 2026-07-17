@@ -1,12 +1,15 @@
 # ─── Nexus CV .gitignore ───
+# Professional .gitignore for hackathon-ready repository
 
-# Environment & Secrets
+# ── Environment & Secrets ──
 .env
+.env.*
+!.env.example
 .venv/
 venv/
 env/
 
-# Python
+# ── Python ──
 __pycache__/
 *.py[cod]
 *.pyc
@@ -21,37 +24,44 @@ instance/
 .coverage
 htmlcov/
 
-# Database
+# ── Database (runtime-generated) ──
 *.db
 *.sqlite3
 
-# Logs
-logs/
-*.log
+# ── Runtime Directories ──
+logs/*.log
+cache/bulk_results/*.json
+output/*.csv
+output/*.json
+reports/*.pdf
 
-# Uploads & Reports (user-generated, runtime)
-uploads/
-reports/
-generated_reports/
+# ── Uploads (user-generated, runtime) ──
+uploads/*
+!uploads/.gitkeep
+!uploads/candidate_*.pdf
 
-# IDE
+# ── IDE ──
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# ── OS ──
 .DS_Store
 Thumbs.db
 
-# Node (if applicable)
+# ── Node (if applicable) ──
 node_modules/
 
-# Archive (dev test files)
-archive/
+# ── Temporary Files ──
+*.tmp
+*.bak
+*.log
+temp/
 
-# Keep placeholder files in gitignored dirs
-!uploads/.gitkeep
+# ── Keep placeholder files ──
+!output/.gitkeep
+!cache/bulk_results/.gitkeep
 !reports/.gitkeep
 !logs/.gitkeep
