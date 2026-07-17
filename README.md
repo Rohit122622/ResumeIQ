@@ -28,6 +28,19 @@
 
 <br>
 
+## 🚀 Project Highlights
+
+- 🤖 6-Agent AI Recruitment Pipeline
+- 📄 AI Resume Analyzer with ATS Scoring
+- 📊 Bulk Resume Screening & Candidate Ranking
+- 🧠 Recruiter AI Copilot (Natural Language Q&A)
+- 🔍 Semantic Resume–JD Matching using FAISS + BGE
+- 📈 Hybrid ML Ranking (XGBoost + AI + RAG)
+- 🔄 Resume Comparison Engine
+- 📑 PDF, CSV & JSON Report Generation
+- 🔐 Google OAuth Authentication
+- ⚡ Multi-LLM Fallback Architecture
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -84,39 +97,114 @@ The platform is built around three core ideas:
 
 <br>
 
+# 🎥 Demo
+
+## Live Demo
+
+Coming Soon
+
+---
+
+## Demo Video
+
+Coming Soon
+
+---
+
+## Screenshots
+
+> Replace the placeholders below with screenshots after deployment.
+
 ## Screenshots
 
 ### Landing Page
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Dashboard
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Resume Analyzer
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Eligibility / ATS Results
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Recruiter AI Copilot
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Bulk Screening Portal
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Resume Comparison
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### Career Roadmap
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### PDF Report
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 ### n8n Workflow
-*(Add Screenshot Here)*
+<p align="center">
+<img src="docs/screenshots/home.png" width="90%">
+</p>
+
+> Add Screenshot Here
 
 <br>
+
+# Why Nexus CV?
+
+Traditional resume screening systems rely heavily on keyword matching and often fail to understand the actual context of a candidate's experience.
+
+Nexus CV combines Machine Learning, Retrieval-Augmented Generation (RAG), Semantic Search, Explainable AI, and a Multi-Agent Architecture to deliver recruiter-friendly insights rather than just ATS scores.
+
+Instead of simply saying a candidate scored 78%, Nexus CV explains:
+
+- Why the candidate received the score
+- Missing skills
+- Resume strengths
+- ATS improvements
+- Career recommendations
+- Candidate ranking reasons
+- Behavioral indicators
+- Platform activity
 
 ## Architecture
 
@@ -474,6 +562,21 @@ The active LLM generates structured, prioritized suggestions for improving the r
 
 <br>
 
+# 📊 Project Statistics
+
+| Metric | Value |
+|---------|------:|
+| AI Agents | 6 |
+| Hybrid Scoring Signals | 7 |
+| LLM Providers | 6 |
+| Flask Routes | 40+ |
+| Python Modules | 35+ |
+| ML Models | 3 |
+| Vector Search | FAISS |
+| Authentication | Google OAuth |
+| Export Formats | PDF, CSV, JSON |
+| Resume Formats | PDF |
+
 ## Folder Structure
 
 ```
@@ -787,6 +890,10 @@ Open `http://localhost:5678`, click **Import from File**, select `n8n/bulk_resum
 
 <br>
 
+# Repository Topics
+
+AI • Resume Analyzer • ATS • Agentic AI • Machine Learning • NLP • RAG • Semantic Search • Flask • Python • FAISS • XGBoost • HRTech • Recruitment • LLM
+
 ## Future Improvements
 
 - [ ] **Docker Compose Setup** — Single-command local deployment for Flask, n8n, and dependencies
@@ -816,6 +923,12 @@ git push origin feature/your-feature-name
 ```
 
 <br>
+
+# Disclaimer
+
+This project is intended for educational, research, and recruitment-assistance purposes.
+
+Nexus CV is designed to assist recruiters by providing explainable insights into resumes and candidate profiles. Final hiring decisions should always involve human evaluation.
 
 ## License
 
