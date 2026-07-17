@@ -7,6 +7,9 @@ Falls back gracefully to None if GEMINI_API_KEY is not set or any call fails.
 
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from services.ml.skill_registry import ROLE_SKILL_MAP, ROLE_SKILL_SCOPE
@@ -48,11 +51,11 @@ def call_gemini(prompt, retries=2):
                     )
 
                     if hasattr(response, "text") and response.text:
-                        print(f"[Gemini] {model_name} response received")
+                        logger.info("Gemini %s response received", model_name)
                         return response.text
 
                     if hasattr(response, "candidates") and response.candidates:
-                        print(f"[Gemini] {model_name} candidate response received")
+                        logger.info("Gemini %s candidate response received", model_name)
                         return response.candidates[0].content.parts[0].text
                     
                     raise Exception("Empty Gemini response")
@@ -60,10 +63,10 @@ def call_gemini(prompt, retries=2):
                     last_error = e
                     err_str = str(e)
                     if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                        print(f"[Gemini] {model_name} rate-limited, trying next")
+                        logger.info("Gemini %s rate-limited, trying next", model_name)
                         break
                     if "not found" in err_str.lower() or "invalid" in err_str.lower():
-                        print(f"[Gemini] {model_name} not available, trying next")
+                        logger.info("Gemini %s not available, trying next", model_name)
                         break
                     if attempt < retries:
                         time.sleep(1.5)
@@ -73,7 +76,7 @@ def call_gemini(prompt, retries=2):
         raise last_error or Exception("All Gemini models exhausted")
 
     except Exception as e:
-        print(f"[Gemini] Error: {type(e).__name__}")
+        logger.warning("Gemini Error: %s", type(e).__name__)
         raise e
 
 _model = True  # Mocking _model True so further script conditions still pass
@@ -113,7 +116,7 @@ def _call_gemini(prompt):
             return data
         return None
     except Exception as e:
-        print(f"[Gemini] Internal call error: {type(e).__name__}")
+        logger.warning("Gemini internal call error: %s", type(e).__name__)
         return None
 
 

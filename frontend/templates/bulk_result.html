@@ -17,7 +17,7 @@
 
     <div class="results-hero">
         <h1>🏆 <span class="accent-text">Top {{ top_n }} Candidates Found</span></h1>
-        <p>Ranked using 5-Signal Hybrid: Multi-Agent AI + ML + Semantic RAG + XGBoost</p>
+        <p>Ranked using 7-Signal Hybrid: Multi-Agent AI + ML + Semantic RAG + XGBoost + Behavioral + Platform</p>
     </div>
 
     <!-- Agent Status -->
@@ -38,7 +38,126 @@
         <span class="stat-chip">🔬 Evidence-Based</span>
     </div>
 
-    <!-- TOP CANDIDATES -->
+    <!-- ═══ EXPORT BUTTONS ═══ -->
+    <div style="display:flex; justify-content:center; gap:12px; margin:20px 0; flex-wrap:wrap;">
+        <a href="/export/csv" class="btn outline small" id="export-csv-btn">📥 Download CSV</a>
+        <a href="/export/json" class="btn outline small" id="export-json-btn">📥 Download JSON</a>
+    </div>
+
+    <!-- ═══ RECRUITER DASHBOARD ═══ -->
+    {% if dashboard %}
+    <section class="card" style="border-left:4px solid #8b5cf6; margin-bottom:24px;">
+        <h2 style="text-align:center; margin-bottom:20px;">📊 Recruiter Dashboard</h2>
+
+        <!-- Averages Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:20px;">
+            <div class="stat-mini-card">
+                <div class="stat-mini-value">{{ dashboard.averages.overall }}</div>
+                <div class="stat-mini-label">Avg Score</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-mini-value">{{ dashboard.averages.ats }}</div>
+                <div class="stat-mini-label">Avg ATS</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-mini-value">{{ dashboard.averages.behavioral }}</div>
+                <div class="stat-mini-label">Avg Behavioral</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-mini-value">{{ dashboard.averages.platform }}</div>
+                <div class="stat-mini-label">Avg Platform</div>
+            </div>
+            <div class="stat-mini-card">
+                <div class="stat-mini-value">{{ dashboard.total_candidates }}</div>
+                <div class="stat-mini-label">Total</div>
+            </div>
+        </div>
+
+        <!-- Skills Insights -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div>
+                <b style="font-size:13px;">✅ Top Skills Found:</b>
+                <div style="margin-top:6px;">
+                    {% for skill, count in dashboard.top_skills[:8] %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin:4px 0;">
+                        <span class="skill-tag skill-matched" style="margin:0;">{{ skill }}</span>
+                        <span style="font-size:11px; color:var(--text-muted);">{{ count }}×</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <b style="font-size:13px;">❌ Most Missing Skills:</b>
+                <div style="margin-top:6px;">
+                    {% for skill, count in dashboard.most_missing_skills[:8] %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin:4px 0;">
+                        <span class="skill-tag skill-missing" style="margin:0;">{{ skill }}</span>
+                        <span style="font-size:11px; color:var(--text-muted);">{{ count }}×</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Distribution -->
+        <div style="margin-bottom:16px;">
+            <b style="font-size:13px;">📈 Score Distribution:</b>
+            <div style="display:flex; gap:6px; align-items:flex-end; height:80px; margin-top:8px;">
+                {% for range, count in dashboard.score_distribution.items() %}
+                {% set max_count = dashboard.score_distribution.values()|max if dashboard.score_distribution.values()|max > 0 else 1 %}
+                <div style="flex:1; text-align:center;">
+                    <div style="background:linear-gradient(180deg, #8b5cf6, #6366f1); border-radius:4px 4px 0 0; height:{{ (count / max_count * 60)|int }}px; min-height:4px; transition:height 0.3s;"></div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">{{ range }}</div>
+                    <div style="font-size:11px; font-weight:600;">{{ count }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Behavioral Insights -->
+        {% if dashboard.behavioral_insights %}
+        <div class="accordion" id="behavioral-insights-acc">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>🧠 Behavioral Insights</span>
+                <span class="accordion-chevron">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px;">
+                    {% for cat, info in dashboard.behavioral_insights.items() %}
+                    <div style="background:var(--card-bg); border-radius:8px; padding:10px; text-align:center; border:1px solid var(--border);">
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:capitalize;">{{ cat|replace("_", " ") }}</div>
+                        <div style="font-size:18px; font-weight:700; color:var(--secondary);">{{ info.average }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Platform Insights -->
+        {% if dashboard.platform_insights %}
+        <div class="accordion" id="platform-insights-acc">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>🌐 Platform Insights</span>
+                <span class="accordion-chevron">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                    {% for platform, info in dashboard.platform_insights.items() %}
+                    {% if info.count > 0 %}
+                    <span style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:20px; padding:4px 12px; font-size:12px;">
+                        {{ platform|title }}: {{ info.count }} ({{ info.percentage }}%)
+                    </span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- ═══ TOP CANDIDATES ═══ -->
     {% for candidate in result.top_candidates %}
     <section class="card" style="border-left:4px solid {% if loop.index == 1 %}#f59e0b{% elif loop.index == 2 %}#94a3b8{% elif loop.index == 3 %}#cd7f32{% else %}#6366f1{% endif %};">
 
@@ -49,6 +168,11 @@
             {% if candidate.agent_confidence and candidate.agent_confidence != 'pending' %}
             <span class="confidence-badge {{ candidate.agent_confidence }}">{{ candidate.agent_confidence }} confidence</span>
             {% endif %}
+            <!-- Compare checkbox -->
+            <label style="margin-left:auto; font-size:12px; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" class="compare-checkbox" data-index="{{ loop.index0 }}" data-name="{{ candidate.name or candidate.filename }}">
+                Compare
+            </label>
         </div>
 
         <div class="candidate-header">
@@ -74,6 +198,9 @@
             {% if candidate.xgboost_score %}
             <span class="score-pill" style="border-color:rgba(234,179,8,0.3);background:rgba(234,179,8,0.06);color:#eab308;">⚙️ XGB: {{ candidate.xgboost_score }}</span>
             {% endif %}
+            <!-- NEW: Behavioral + Platform score pills -->
+            <span class="score-pill" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.06);color:#10b981;">💡 Behavioral: {{ candidate.behavioral_score|default(50) }}/100</span>
+            <span class="score-pill" style="border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.06);color:#3b82f6;">🌐 Platform: {{ candidate.platform_score|default(50) }}/100</span>
         </div>
 
         <!-- Skills -->
@@ -116,8 +243,67 @@
             </div>
         </div>
 
+        <!-- ═══ NEW: Why Ranked Here (Explainable AI) ═══ -->
+        {% if candidate.ranking_explanation %}
+        <div class="accordion" id="explanation-{{ loop.index }}">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>📊 Why Ranked #{{ candidate.rank }}</span>
+                <span class="accordion-chevron">▼</span>
+            </div>
+            <div class="accordion-content">
+                {% set expl = candidate.ranking_explanation %}
+                <div style="margin-bottom:10px;">
+                    <span style="background:{% if expl.recommendation == 'Strong Hire' %}rgba(16,185,129,0.15){% elif expl.recommendation == 'Recommended' %}rgba(59,130,246,0.15){% else %}rgba(234,179,8,0.15){% endif %}; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600;">
+                        {{ expl.recommendation }}
+                    </span>
+                </div>
+                {% if expl.strengths %}
+                <div style="margin-bottom:8px;">
+                    <b style="color:#10b981; font-size:12px;">💪 Strengths:</b>
+                    <ul style="margin:4px 0; padding-left:18px; font-size:13px;">
+                        {% for s in expl.strengths[:5] %}
+                        <li>{{ s }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% if expl.weaknesses %}
+                <div style="margin-bottom:8px;">
+                    <b style="color:#ef4444; font-size:12px;">⚠️ Weaknesses:</b>
+                    <ul style="margin:4px 0; padding-left:18px; font-size:13px;">
+                        {% for w in expl.weaknesses[:4] %}
+                        <li>{{ w }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% if expl.risk_factors %}
+                <div style="margin-bottom:8px;">
+                    <b style="color:#f59e0b; font-size:12px;">🔍 Risk Factors:</b>
+                    <ul style="margin:4px 0; padding-left:18px; font-size:13px;">
+                        {% for r in expl.risk_factors[:3] %}
+                        <li>{{ r }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <div style="margin-top:8px; padding:10px; background:var(--bg); border-radius:8px; font-size:12px; line-height:1.5;">
+                    {{ expl.summary }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
     </section>
     {% endfor %}
+
+    <!-- ═══ COMPARE SELECTED BUTTON ═══ -->
+    <div id="compare-bar" style="display:none; text-align:center; margin:16px 0;">
+        <button class="btn large" id="compare-btn" onclick="compareSelected()">🔄 Compare Selected Candidates</button>
+    </div>
+
+    <!-- ═══ COMPARISON RESULT ═══ -->
+    <div id="comparison-result" style="display:none; margin:20px 0;"></div>
 
     <!-- ALL CANDIDATES TABLE -->
     {% if result.all_results|length > top_n %}
@@ -130,6 +316,8 @@
                     <th>Candidate</th>
                     <th style="text-align:center;">ATS</th>
                     <th style="text-align:center;">Agent</th>
+                    <th style="text-align:center;">Behavioral</th>
+                    <th style="text-align:center;">Platform</th>
                     <th style="text-align:center;">Final</th>
                 </tr>
             </thead>
@@ -143,6 +331,8 @@
                         {% if r.agent_score %}<span style="color:#8b5cf6; font-weight:600;">{{ (r.agent_score * 10)|int }}%</span>
                         {% else %}<span style="opacity:0.3;">—</span>{% endif %}
                     </td>
+                    <td style="text-align:center;"><span style="color:#10b981;">{{ r.behavioral_score|default(50) }}</span></td>
+                    <td style="text-align:center;"><span style="color:#3b82f6;">{{ r.platform_score|default(50) }}</span></td>
                     <td style="text-align:center;"><span style="font-weight:700; color:var(--secondary);">{{ r.combined_score }}%</span></td>
                 </tr>
                 {% endfor %}
@@ -152,6 +342,34 @@
     {% endif %}
 
     <div class="formula-box">{{ result.scoring_details }}</div>
+
+    <!-- ═══ RECRUITER AI COPILOT ═══ -->
+    <section class="card" style="border-left:4px solid #8b5cf6; margin-top:24px;">
+        <h3 style="margin-bottom:12px;">🤖 Recruiter AI Copilot</h3>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+            Ask questions about the screening results. Click a quick question or type your own.
+        </p>
+
+        <!-- Quick-Ask Buttons -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;" id="quick-ask-row">
+            <button class="btn outline small" onclick="quickAsk('Who is the best candidate?')" style="font-size:12px; padding:6px 12px;">🏆 Best Candidate</button>
+            <button class="btn outline small" onclick="quickAsk('What are the most common missing skills?')" style="font-size:12px; padding:6px 12px;">❌ Missing Skills</button>
+            <button class="btn outline small" onclick="quickAsk('Which candidates have leadership potential?')" style="font-size:12px; padding:6px 12px;">👔 Leadership</button>
+            <button class="btn outline small" onclick="quickAsk('Which candidate has the strongest ATS score?')" style="font-size:12px; padding:6px 12px;">📄 Strongest ATS</button>
+            <button class="btn outline small" onclick="quickAsk('Show candidates suitable for ML roles')" style="font-size:12px; padding:6px 12px;">🧠 ML Candidates</button>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="copilot-input" placeholder="Ask a question about the candidates..."
+                style="flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:14px;"
+                onkeypress="if(event.key==='Enter')askCopilot()">
+            <button class="btn" onclick="askCopilot()" id="copilot-send-btn">Ask AI</button>
+        </div>
+        <div id="copilot-response" style="margin-top:12px; display:none;">
+            <div id="copilot-method-badge" style="margin-bottom:6px;"></div>
+            <div id="copilot-answer" class="reason-box" style="white-space:pre-wrap; line-height:1.6;"></div>
+        </div>
+    </section>
 
     <div style="display:flex; justify-content:center; gap:16px; margin-top:32px; flex-wrap:wrap;">
         <a href="/bulk-screen" class="btn large btn-fire">🔍 Screen More</a>
@@ -174,5 +392,160 @@ function toggleAccordion(headerElement) {
         chevron.style.transform = 'rotate(0deg)';
     }
 }
+
+// ═══ COMPARE CANDIDATES ═══
+const checkboxes = document.querySelectorAll('.compare-checkbox');
+const compareBar = document.getElementById('compare-bar');
+
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.compare-checkbox:checked');
+        if (compareBar) {
+            compareBar.style.display = checked.length === 2 ? 'block' : 'none';
+        }
+    });
+});
+
+function compareSelected() {
+    const checked = document.querySelectorAll('.compare-checkbox:checked');
+    if (checked.length !== 2) {
+        alert('Please select exactly 2 candidates to compare.');
+        return;
+    }
+
+    const idxA = parseInt(checked[0].dataset.index);
+    const idxB = parseInt(checked[1].dataset.index);
+    const nameA = checked[0].dataset.name;
+    const nameB = checked[1].dataset.name;
+
+    const resultDiv = document.getElementById('comparison-result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="card" style="text-align:center; padding:20px;">⏳ Comparing candidates...</div>';
+
+    fetch('/api/v1/compare-candidates', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({candidate_a: idxA, candidate_b: idxB})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            resultDiv.innerHTML = `<div class="card" style="border-left:4px solid var(--danger);"><p>⚠️ ${data.error}</p></div>`;
+            return;
+        }
+
+        let html = `<section class="card" style="border-left:4px solid #8b5cf6;">`;
+        html += `<h3 style="margin-bottom:16px;">🔄 ${data.candidate_a_name} vs ${data.candidate_b_name}</h3>`;
+
+        // Score comparison table
+        const metrics = data.score_comparison?.metrics || {};
+        html += `<table style="width:100%; margin-bottom:16px;">`;
+        html += `<thead><tr><th>Metric</th><th style="text-align:center;">${data.candidate_a_name}</th><th style="text-align:center;">${data.candidate_b_name}</th><th style="text-align:center;">Better</th></tr></thead><tbody>`;
+        for (const [key, m] of Object.entries(metrics)) {
+            const better = m.better === 'a' ? data.candidate_a_name : (m.better === 'b' ? data.candidate_b_name : 'Tie');
+            html += `<tr><td>${m.label}</td><td style="text-align:center;">${m.a}</td><td style="text-align:center;">${m.b}</td><td style="text-align:center; font-weight:600;">${better}</td></tr>`;
+        }
+        html += `</tbody></table>`;
+
+        // Skill comparison
+        const skills = data.skill_comparison || {};
+        if (skills.shared?.length || skills.only_a?.length || skills.only_b?.length) {
+            html += `<div style="margin-bottom:12px;"><b>🎯 Skill Comparison:</b></div>`;
+            if (skills.shared?.length) html += `<div style="margin-bottom:4px; font-size:13px;"><b>Shared:</b> ${skills.shared.slice(0,8).join(', ')}</div>`;
+            if (skills.only_a?.length) html += `<div style="margin-bottom:4px; font-size:13px;"><b>Only ${data.candidate_a_name}:</b> ${skills.only_a.slice(0,6).join(', ')}</div>`;
+            if (skills.only_b?.length) html += `<div style="font-size:13px;"><b>Only ${data.candidate_b_name}:</b> ${skills.only_b.slice(0,6).join(', ')}</div>`;
+        }
+
+        // Recommendation
+        html += `<div style="margin-top:16px; padding:12px; background:rgba(99,102,241,0.06); border-radius:8px;">`;
+        html += `<b>🏆 Recommendation:</b> ${data.recommendation}<br>`;
+        html += `<span style="font-size:13px; color:var(--text-muted);">${data.justification}</span>`;
+        html += `</div>`;
+
+        html += `</section>`;
+        resultDiv.innerHTML = html;
+    })
+    .catch(err => {
+        resultDiv.innerHTML = `<div class="card" style="border-left:4px solid var(--danger);"><p>⚠️ Comparison failed: ${err.message}</p></div>`;
+    });
+}
+
+// ═══ RECRUITER AI COPILOT ═══
+function quickAsk(question) {
+    document.getElementById('copilot-input').value = question;
+    askCopilot();
+}
+
+function askCopilot() {
+    const input = document.getElementById('copilot-input');
+    const responseDiv = document.getElementById('copilot-response');
+    const answerDiv = document.getElementById('copilot-answer');
+    const badgeDiv = document.getElementById('copilot-method-badge');
+    const btn = document.getElementById('copilot-send-btn');
+
+    const question = input.value.trim();
+    if (!question) return;
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Thinking...';
+    responseDiv.style.display = 'block';
+    answerDiv.textContent = 'Analyzing your question...';
+    badgeDiv.innerHTML = '';
+
+    fetch('/api/v1/copilot', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question: question})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            answerDiv.textContent = '⚠️ ' + data.error;
+            badgeDiv.innerHTML = '';
+        } else {
+            answerDiv.textContent = data.answer || 'No answer available.';
+
+            // Method badge
+            const method = data.method || 'unknown';
+            const badgeColors = { llm: '#10b981', rule: '#6366f1', fallback: '#f59e0b', error: '#ef4444' };
+            const badgeLabels = { llm: '🧠 AI-Powered', rule: '⚡ Rule Engine', fallback: '📋 Summary', error: '⚠️ Error' };
+            const color = badgeColors[method] || '#6b7280';
+            const label = badgeLabels[method] || method;
+            badgeDiv.innerHTML = `<span style="display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; color:white; background:${color};">${label}</span>`;
+        }
+        btn.disabled = false;
+        btn.textContent = 'Ask AI';
+    })
+    .catch(err => {
+        answerDiv.textContent = '⚠️ Request failed: ' + err.message;
+        badgeDiv.innerHTML = '';
+        btn.disabled = false;
+        btn.textContent = 'Ask AI';
+    });
+}
 </script>
+
+<style>
+.stat-mini-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.stat-mini-card:hover {
+    transform: translateY(-2px);
+}
+.stat-mini-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--secondary);
+}
+.stat-mini-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+</style>
 {% endblock %}

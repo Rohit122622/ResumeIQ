@@ -193,8 +193,8 @@ class DecisionAgent:
                 final_result = parsed
                 break
 
-        # If no final result from LLM, use rule-based scoring
-        if final_result is None:
+        # If no final result from LLM or it's missing critical scoring keys, use rule-based scoring fallback
+        if final_result is None or ("final_score" not in final_result and "score" not in final_result):
             final_result = self._rule_based_scoring(sub_scores)
             logger.info("DecisionAgent: Using rule-based computation.")
             thought_trace.append("Rule-based: Computed from sub-agent scores")
@@ -265,24 +265,82 @@ class DecisionAgent:
     def _rule_based_scoring(self, sub_scores):
         """
         Compute score from sub-agents without LLM.
-        Normalized: each signal contributes uniquely with non-overlapping weights.
+        Evidence-driven: uses continuous variables for fine-grained scoring.
+        Fully deterministic — same inputs always produce same outputs.
         """
-        skill_score = sub_scores.get("skill", {}).get("skill_score", 5) * 10  # 0-100
-        exp_score = sub_scores.get("experience", {}).get("experience_score", 5) * 10  # 0-100
-        ats_score = sub_scores.get("ats", {}).get("ats_score", 50)  # 0-100
+        skill_data = sub_scores.get("skill", {})
+        exp_data = sub_scores.get("experience", {})
+        ats_data = sub_scores.get("ats", {})
 
-        # Normalized weights: skill=35%, experience=35%, ATS=30%
-        final = round(skill_score * 0.35 + exp_score * 0.35 + ats_score * 0.30, 1)
+        skill_score = skill_data.get("skill_score", 5) * 10  # 0-100
+        exp_score = exp_data.get("experience_score", 5) * 10  # 0-100
+        ats_score = ats_data.get("ats_score", 50)  # 0-100
 
-        # Compute evidence string from sub-scores
-        matched = sub_scores.get("skill", {}).get("matched", [])
-        years = sub_scores.get("experience", {}).get("years", 0)
+        # Base weighted score: skill=30%, experience=30%, ATS=25%
+        base = skill_score * 0.30 + exp_score * 0.30 + ats_score * 0.25
 
-        reasoning = (
-            f"Candidate shows {len(matched)} skill matches "
-            f"with {years} years of experience. "
-            f"ATS compatibility score is {ats_score}/100."
-        )
+        # ── Evidence-based micro-adjustments (±15 points max) ──
+        adjustment = 0.0
+
+        # Skill count bonus: each matched skill adds fractional points
+        matched = skill_data.get("matched", [])
+        matched_count = len(matched)
+        if matched_count >= 8:
+            adjustment += 4.0
+        elif matched_count >= 5:
+            adjustment += 2.5
+        elif matched_count >= 3:
+            adjustment += 1.0
+
+        # Critical skills bonus
+        critical_matched = len(skill_data.get("critical_matched", []))
+        adjustment += min(critical_matched * 1.5, 5.0)
+
+        # Experience years as continuous variable
+        years = exp_data.get("years", 0)
+        adjustment += min(years * 0.8, 6.0)  # max 6 points from years
+
+        # Project count contribution
+        projects = exp_data.get("project_count", 0)
+        adjustment += min(projects * 0.5, 3.0)  # max 3 points
+
+        # Impact evidence bonus
+        impact_count = len(exp_data.get("impact_evidence", []))
+        adjustment += min(impact_count * 1.0, 3.0)  # max 3 points
+
+        # Leadership bonus
+        if exp_data.get("leadership", False):
+            adjustment += 2.0
+
+        # ATS breakdown fine-tuning (if available)
+        breakdown = ats_data.get("breakdown", {})
+        if isinstance(breakdown, dict):
+            keyword_score = breakdown.get("keyword_score", 0)
+            adjustment += min(keyword_score / 10.0, 2.0)
+
+        # Missing skills penalty
+        missing_count = len(skill_data.get("missing", []))
+        if missing_count > 6:
+            adjustment -= 3.0
+        elif missing_count > 3:
+            adjustment -= 1.5
+
+        final = round(base + adjustment, 1)
+        final = max(0, min(100, final))
+
+        # Build detailed reasoning
+        reasoning_parts = []
+        if matched_count > 0:
+            reasoning_parts.append(f"{matched_count} skill matches")
+        if years > 0:
+            reasoning_parts.append(f"{years} years of experience")
+        if projects > 0:
+            reasoning_parts.append(f"{projects} projects identified")
+        if impact_count > 0:
+            reasoning_parts.append(f"{impact_count} quantified achievements")
+        reasoning_parts.append(f"ATS compatibility: {ats_score}/100")
+
+        reasoning = f"Candidate evaluation: {'. '.join(reasoning_parts)}."
 
         confidence = _compute_confidence(sub_scores, final)
 
@@ -294,7 +352,7 @@ class DecisionAgent:
         }
 
     def _cross_validate(self, result, sub_scores):
-        """Sanity-check LLM score against sub-agent scores."""
+        """Sanity-check LLM score against sub-agent scores. Evidence-driven blend."""
         llm_score = result.get("final_score", 50)
         try:
             llm_score = float(llm_score)
@@ -306,12 +364,14 @@ class DecisionAgent:
         ats = sub_scores.get("ats", {}).get("ats_score", 50)
         ml_avg = (skill + exp + ats) / 3.0
 
-        # If LLM score deviates more than 50 points from ML average, clamp it
-        if abs(llm_score - ml_avg) > 50:
+        # If LLM score deviates more than 35 points from ML average, blend it
+        deviation = abs(llm_score - ml_avg)
+        if deviation > 35:
             logger.warning(
-                "DecisionAgent cross-validation: LLM=%.1f vs ML_avg=%.1f -- clamping",
-                llm_score, ml_avg
+                "DecisionAgent cross-validation: LLM=%.1f vs ML_avg=%.1f (dev=%.1f) — blending",
+                llm_score, ml_avg, deviation
             )
-            llm_score = ml_avg * 0.4 + llm_score * 0.6
+            # 50/50 blend for large deviations
+            llm_score = ml_avg * 0.5 + llm_score * 0.5
 
-        return max(0, min(100, llm_score))
+        return round(max(0, min(100, llm_score)), 1)

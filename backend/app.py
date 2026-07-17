@@ -38,6 +38,30 @@ from services.processing.multi_role_predictor import predict_multiple_roles
 from services.processing.compare_pdf_generator import generate_comparison_pdf
 from backend.input_validator import validate_resume_text, validate_job_description, validate_content_quality
 
+# ── New Challenge Compliance Modules ──
+try:
+    from services.processing.export_engine import ExportEngine
+    _export_engine = ExportEngine()
+except ImportError:
+    _export_engine = None
+
+try:
+    from services.processing.comparison_engine import CandidateComparisonEngine
+    _comparison_engine = CandidateComparisonEngine()
+except ImportError:
+    _comparison_engine = None
+
+try:
+    from services.ai.recruiter_copilot import RecruiterCopilotAgent
+    _copilot = RecruiterCopilotAgent()
+except ImportError:
+    _copilot = None
+
+try:
+    from services.processing.dashboard_metrics import generate_dashboard_metrics
+except ImportError:
+    generate_dashboard_metrics = None
+
 try:
     from services.ai import gemini_agent
 except ImportError:
@@ -164,12 +188,40 @@ microsoft = oauth.register(
 
 UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, "uploads")
 REPORT_FOLDER = os.path.join(PROJECT_ROOT, "reports")
+OUTPUT_FOLDER = os.path.join(PROJECT_ROOT, "output")
+CACHE_FOLDER = os.path.join(PROJECT_ROOT, "cache", "bulk_results")
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["REPORT_FOLDER"] = REPORT_FOLDER
+app.config["OUTPUT_FOLDER"] = OUTPUT_FOLDER
+app.config["CACHE_FOLDER"] = CACHE_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(REPORT_FOLDER, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+os.makedirs(CACHE_FOLDER, exist_ok=True)
+
+
+def _save_last_bulk_result(user, result):
+    try:
+        path = os.path.join(app.config["CACHE_FOLDER"], f"{user}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False)
+        app.logger.info(f"Saved last bulk result to cache for user: {user}")
+    except Exception as e:
+        app.logger.error(f"Failed to save last_bulk_result to cache: {e}")
+
+
+def _load_last_bulk_result(user):
+    try:
+        path = os.path.join(app.config["CACHE_FOLDER"], f"{user}.json")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as e:
+        app.logger.error(f"Failed to load last_bulk_result from cache: {e}")
+    return None
+
 
 # ── Initialize database tables (once) ──
 create_users_table()
@@ -1084,6 +1136,10 @@ def bulk_screen():
         flash("Please upload resumes and provide a job description", "error")
         return redirect("/bulk-screen")
 
+    if len(jd_text.strip()) < 30:
+        flash("Job description is too short. Please provide at least a few sentences describing the role and requirements.", "error")
+        return redirect("/bulk-screen")
+
     # Set up progress tracking
     user = session.get("user", "anonymous")
     progress_queue = queue.Queue()
@@ -1140,6 +1196,18 @@ def bulk_screen():
     bulk_screener.set_progress_callback(None)
     _bulk_progress.pop(user, None)
 
+    # Store results in session for export/copilot
+    # Strip non-serializable fields (resume_text, parsed_data, path)
+    serializable_result = {
+        "top_candidates": result.get("top_candidates", []),
+        "all_results": result.get("all_results", []),
+        "total_processed": result.get("total_processed", 0),
+        "top_n": result.get("top_n", 3),
+        "scoring_details": result.get("scoring_details", ""),
+        "agent_enabled": result.get("agent_enabled", False),
+    }
+    _save_last_bulk_result(user, serializable_result)
+
     # Trigger n8n webhook automatically — send actual file as multipart
     try:
         import requests as http_requests
@@ -1171,7 +1239,142 @@ def bulk_screen():
     except Exception as e:
         app.logger.error(f"Failed to trigger n8n webhook: {e}")
 
-    return render_template("bulk_result.html", result=result, role=role, top_n=result.get("top_n", 3))
+    return render_template("bulk_result.html", result=result, role=role, top_n=result.get("top_n", 3),
+                           dashboard=generate_dashboard_metrics(result) if generate_dashboard_metrics else None)
+
+
+# ── CSV / JSON Export Endpoints ──
+
+@app.route("/export/csv")
+@csrf.exempt
+def export_csv():
+    """Download ranked candidates as CSV."""
+    if "user" not in session:
+        return redirect("/login")
+
+    user = session.get("user")
+    result = _load_last_bulk_result(user)
+    if not result or not _export_engine:
+        flash("No screening results available for export.", "error")
+        return redirect("/bulk-screen")
+
+    try:
+        output_path = os.path.join(
+            app.config["OUTPUT_FOLDER"],
+            f"ranked_candidates_{user}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        )
+        _export_engine.generate_csv(result, output_path)
+        return send_file(output_path, as_attachment=True, download_name="ranked_candidates.csv")
+    except Exception as e:
+        app.logger.error(f"CSV export failed: {e}")
+        flash("Export failed. Please try again.", "error")
+        return redirect("/bulk-screen")
+
+
+@app.route("/export/json")
+@csrf.exempt
+def export_json():
+    """Download ranked candidates as JSON."""
+    if "user" not in session:
+        return redirect("/login")
+
+    user = session.get("user")
+    result = _load_last_bulk_result(user)
+    if not result or not _export_engine:
+        flash("No screening results available for export.", "error")
+        return redirect("/bulk-screen")
+
+    try:
+        output_path = os.path.join(
+            app.config["OUTPUT_FOLDER"],
+            f"ranked_candidates_{user}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
+        _export_engine.generate_json(result, output_path)
+        return send_file(output_path, as_attachment=True, download_name="ranked_candidates.json")
+    except Exception as e:
+        app.logger.error(f"JSON export failed: {e}")
+        flash("Export failed. Please try again.", "error")
+        return redirect("/bulk-screen")
+
+
+# ── Candidate Comparison Endpoint ──
+
+@app.route("/api/v1/compare-candidates", methods=["POST"])
+@csrf.exempt
+def api_compare_candidates():
+    """Compare two candidates from the last bulk screening session."""
+    if "user" not in session:
+        return jsonify({"error": "Authentication required"}), 401
+
+    if not _comparison_engine:
+        return jsonify({"error": "Comparison engine not available"}), 500
+
+    user = session.get("user")
+    result = _load_last_bulk_result(user)
+    if not result:
+        return jsonify({"error": "No screening results available"}), 400
+
+    data = request.get_json(silent=True) or {}
+    idx_a = data.get("candidate_a", 0)
+    idx_b = data.get("candidate_b", 1)
+
+    all_candidates = result.get("top_candidates", []) + result.get("all_results", [])
+
+    # Deduplicate by name
+    seen = set()
+    unique = []
+    for c in all_candidates:
+        name = c.get("name", c.get("filename", ""))
+        if name not in seen:
+            seen.add(name)
+            unique.append(c)
+
+    if idx_a >= len(unique) or idx_b >= len(unique):
+        return jsonify({"error": "Invalid candidate indices"}), 400
+
+    try:
+        comparison = _comparison_engine.compare(unique[idx_a], unique[idx_b])
+        return jsonify(comparison)
+    except Exception as e:
+        app.logger.error(f"Comparison failed: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ── Recruiter AI Copilot Endpoint ──
+
+@app.route("/api/v1/copilot", methods=["POST"])
+@csrf.exempt
+@limiter.limit("10/minute")
+def api_copilot():
+    """AI-powered recruiter Q&A over screening results."""
+    if "user" not in session:
+        return jsonify({"error": "Authentication required"}), 401
+
+    if not _copilot:
+        return jsonify({"error": "Copilot not available"}), 500
+
+    user = session.get("user")
+    result = _load_last_bulk_result(user)
+    if not result:
+        return jsonify({"error": "No screening results available. Run a bulk screening first."}), 400
+
+    data = request.get_json(silent=True) or {}
+    question = data.get("question", "").strip()
+
+    if not question:
+        return jsonify({"error": "Please provide a question"}), 400
+
+    try:
+        answer = _copilot.ask(question, result)
+        return jsonify(answer)
+    except Exception as e:
+        app.logger.error(f"Copilot error: {e}")
+        return jsonify({
+            "answer": "I encountered an issue processing your question. Please try rephrasing or ask a simpler question.",
+            "evidence": [],
+            "candidates_referenced": [],
+            "method": "error",
+        }), 200  # Return 200 with friendly message instead of 500
 
 
 # ------------------------

@@ -6,15 +6,20 @@ Uses model_hub for embeddings, ats_scorer for ML-based scoring,
 multi-agent pipeline (Skill, Experience, ATS, Decision) for evaluation,
 and gemini_agent for AI explanations.
 
+Now includes PlatformActivityAgent and BehavioralSignalAgent for
+7-signal hybrid scoring.
+
 Supports: individual PDFs and ZIP archives (auto-extracted).
 Limit: 50 resumes max. Uses batching and embedding cache.
 
-Ranking formula (5-signal Hybrid):
-  Final Score = 0.30 * semantic_score
-              + 0.20 * ATS_score
+Ranking formula (7-signal Hybrid):
+  Final Score = 0.20 * semantic_score
+              + 0.18 * ATS_score
               + 0.20 * agent_score
-              + 0.15 * skill_score
-              + 0.15 * xgboost_score
+              + 0.12 * skill_score
+              + 0.10 * xgboost_score
+              + 0.10 * behavioral_score
+              + 0.10 * platform_score
 """
 
 import os
@@ -48,6 +53,26 @@ except ImportError:
     run_agent = None
     run_agent_batch = None
 
+# ── New Agents: Platform Activity + Behavioral Signal ──
+try:
+    from services.ai.agents.platform_agent import PlatformActivityAgent
+    _platform_agent = PlatformActivityAgent()
+except ImportError:
+    _platform_agent = None
+
+try:
+    from services.ai.agents.behavioral_agent import BehavioralSignalAgent
+    _behavioral_agent = BehavioralSignalAgent()
+except ImportError:
+    _behavioral_agent = None
+
+# ── Ranking Explanation Engine ──
+try:
+    from services.processing.explanation_engine import RankingExplanationEngine
+    _explanation_engine = RankingExplanationEngine()
+except ImportError:
+    _explanation_engine = None
+
 # ── XGBoost ML scoring ──
 _xgb_model = None
 _XGB_FEATURES = [
@@ -74,20 +99,20 @@ def _load_or_train_xgboost():
             # Feature validation: check if model expects correct number of features
             if hasattr(model, 'n_features_in_') and model.n_features_in_ == len(_XGB_FEATURES):
                 _xgb_model = model
-                print("[OK] XGBoost model loaded")
+                logger.info("XGBoost model loaded successfully")
                 return _xgb_model
             else:
                 expected = getattr(model, 'n_features_in_', 'unknown')
-                print(f"[WARN] XGBoost feature mismatch: expected {len(_XGB_FEATURES)}, model has {expected}")
+                logger.warning("XGBoost feature mismatch: expected %d, model has %s", len(_XGB_FEATURES), expected)
         except Exception as e:
-            print(f"[WARN] XGBoost load failed: {e}")
+            logger.warning("XGBoost load failed: %s", e)
 
     # Retrain with synthetic data
     try:
         _xgb_model = _retrain_xgboost(model_path)
         return _xgb_model
     except Exception as e:
-        print(f"[WARN] XGBoost retrain failed: {e}")
+        logger.warning("XGBoost retrain failed: %s", e)
         return None
 
 
@@ -98,7 +123,7 @@ def _retrain_xgboost(model_path):
         import joblib
         import numpy as _np
     except ImportError:
-        print("[WARN] xgboost/joblib not installed, ML scoring unavailable")
+        logger.warning("xgboost/joblib not installed, ML scoring unavailable")
         return None
 
     # Generate synthetic training data
@@ -140,8 +165,8 @@ def _retrain_xgboost(model_path):
     # Save model
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
     joblib.dump(model, model_path)
-    print("[WARN] XGBoost retrained due to mismatch (synthetic data)")
-    print(f"[OK] XGBoost model saved to {model_path}")
+    logger.info("XGBoost retrained due to feature mismatch (synthetic data)")
+    logger.info("XGBoost model saved to %s", model_path)
 
     return model
 
@@ -333,6 +358,22 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
             # ── XGBoost score ──
             xgb_score = _compute_xgboost_score(parsed, ats, skill_match_ratio)
 
+            # ── Platform Activity Agent ──
+            platform_result = {"platform_score": 50, "platforms_detected": {}, "details": [], "explanation": ""}
+            if _platform_agent:
+                try:
+                    platform_result = _platform_agent.evaluate(resume_text, parsed_data=parsed)
+                except Exception as plat_err:
+                    logger.warning("PlatformAgent error for %s: %s", filename, plat_err)
+
+            # ── Behavioral Signal Agent ──
+            behavioral_result = {"behavioral_score": 50, "breakdown": {}, "explanation": ""}
+            if _behavioral_agent:
+                try:
+                    behavioral_result = _behavioral_agent.evaluate(resume_text, parsed_data=parsed)
+                except Exception as beh_err:
+                    logger.warning("BehavioralAgent error for %s: %s", filename, beh_err)
+
             results.append({
                 "filename": filename,
                 "name": candidate_name,
@@ -355,6 +396,14 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
                 "confidence": ats.get("confidence", 50),
                 "scoring_method": ats.get("scoring_method", "heuristic"),
                 "feature_importance": ats.get("feature_importance", {}),
+                # ── New agent scores ──
+                "behavioral_score": behavioral_result.get("behavioral_score", 50),
+                "behavioral_breakdown": behavioral_result.get("breakdown", {}),
+                "behavioral_explanation": behavioral_result.get("explanation", ""),
+                "platform_score": platform_result.get("platform_score", 50),
+                "platforms_detected": platform_result.get("platforms_detected", {}),
+                "platform_details": platform_result.get("details", []),
+                "platform_explanation": platform_result.get("explanation", ""),
                 # Agent fields (populated later)
                 "agent_result": None,
                 "agent_score": None,
@@ -440,25 +489,29 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
 
     _emit_progress("ranking", "Computing final hybrid scores")
 
-    # ── Compute final 5-signal hybrid score ──
+    # ── Compute final 7-signal hybrid score ──
     for r in results:
         semantic = r["semantic_raw"]
         ats_norm = r["ats_score"] / 100.0
         skill_match = r["skill_match_raw"]
         xgb_norm = r.get("xgboost_raw", 0.5)
+        behavioral_norm = r.get("behavioral_score", 50) / 100.0
+        platform_norm = r.get("platform_score", 50) / 100.0
 
         if r["agent_score"] is not None:
             agent_norm = r["agent_score"] / 10.0
-            # 5-signal: 0.25 semantic + 0.20 ATS + 0.25 agent + 0.15 skill + 0.15 xgboost
+            # 7-signal: semantic + ATS + agent + skill + xgboost + behavioral + platform
             r["combined_score"] = round(
-                (semantic * 0.25 + ats_norm * 0.20 + agent_norm * 0.25 +
-                 skill_match * 0.15 + xgb_norm * 0.15) * 100, 1
+                (semantic * 0.20 + ats_norm * 0.18 + agent_norm * 0.20 +
+                 skill_match * 0.12 + xgb_norm * 0.10 +
+                 behavioral_norm * 0.10 + platform_norm * 0.10) * 100, 1
             )
         else:
             # No agent: redistribute agent weight
             r["combined_score"] = round(
-                (semantic * 0.35 + ats_norm * 0.25 + skill_match * 0.20 +
-                 xgb_norm * 0.20) * 100, 1
+                (semantic * 0.28 + ats_norm * 0.22 + skill_match * 0.15 +
+                 xgb_norm * 0.15 +
+                 behavioral_norm * 0.10 + platform_norm * 0.10) * 100, 1
             )
 
         r["combined_score"] = round(r["combined_score"], 1)
@@ -473,7 +526,7 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
         assert isinstance(c.get("matched_skills", []), list), "matched_skills must be a list"
         assert isinstance(c.get("missing_skills", []), list), "missing_skills must be a list"
 
-    # ── Generate reasons & AI explanations for top candidates ──
+    # ── Generate reasons, AI explanations, & ranking explanations for top candidates ──
     for i, candidate in enumerate(top_candidates):
         # Use agent reason if available, otherwise fallback to heuristic
         if candidate.get("agent_reason"):
@@ -497,18 +550,31 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
 
         candidate["ai_explanation"] = explanation or candidate["reason"]
 
+        # ── Explainable AI: "Why Ranked Here" ──
+        if _explanation_engine:
+            try:
+                candidate["ranking_explanation"] = _explanation_engine.explain_candidate(
+                    candidate, i + 1, len(results)
+                )
+            except Exception as exp_err:
+                logger.warning("ExplanationEngine error: %s", exp_err)
+                candidate["ranking_explanation"] = None
+        else:
+            candidate["ranking_explanation"] = None
+
     _emit_progress("complete", f"Ranked {len(results)} candidates")
 
     # ── Build scoring details string ──
     xgb_active = any(r.get("xgboost_score") is not None for r in results)
     if agent_enabled:
         scoring_details = (
-            "5-Signal Hybrid: 0.25 × Semantic + 0.20 × ATS + 0.25 × Multi-Agent + "
-            "0.15 × Skill Match + 0.15 × XGBoost"
+            "7-Signal Hybrid: 0.20 × Semantic + 0.18 × ATS + 0.20 × Multi-Agent + "
+            "0.12 × Skill Match + 0.10 × XGBoost + 0.10 × Behavioral + 0.10 × Platform"
         )
     else:
         scoring_details = (
-            "ML Scoring: 0.35 × Semantic + 0.25 × ATS + 0.20 × Skill + 0.20 × XGBoost"
+            "ML Scoring: 0.28 × Semantic + 0.22 × ATS + 0.15 × Skill + 0.15 × XGBoost + "
+            "0.10 × Behavioral + 0.10 × Platform"
         )
 
     return {
@@ -534,6 +600,13 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
                 "agent_confidence": c.get("agent_confidence", "pending"),
                 "agent_evidence": c.get("agent_evidence", []),
                 "agent_reason": c.get("agent_reason", ""),
+                # ── New: Behavioral + Platform + Explanation ──
+                "behavioral_score": c.get("behavioral_score", 50),
+                "behavioral_breakdown": c.get("behavioral_breakdown", {}),
+                "platform_score": c.get("platform_score", 50),
+                "platforms_detected": c.get("platforms_detected", {}),
+                "platform_details": c.get("platform_details", []),
+                "ranking_explanation": c.get("ranking_explanation"),
             }
             for i, c in enumerate(top_candidates)
         ],
@@ -546,6 +619,14 @@ def screen_resumes(pdf_paths, jd_text, role="Software Engineer", top_n=3):
                 "combined_score": r["combined_score"],
                 "confidence": r["confidence"],
                 "agent_score": r.get("agent_score"),
+                "semantic_score": r.get("semantic_score", 0),
+                "skill_match_pct": r.get("skill_match_pct", 0),
+                "behavioral_score": r.get("behavioral_score", 50),
+                "behavioral_breakdown": r.get("behavioral_breakdown", {}),
+                "platform_score": r.get("platform_score", 50),
+                "platforms_detected": r.get("platforms_detected", {}),
+                "matched_skills": r.get("matched_skills", []),
+                "missing_skills": r.get("missing_skills", []),
             }
             for i, r in enumerate(results)
         ],
