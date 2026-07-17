@@ -5,790 +5,828 @@
 <h1 align="center">Nexus CV</h1>
 
 <p align="center">
-  <strong>Production-Grade AI Resume Analyzer & Career Intelligence Platform</strong>
+  <strong>AI-Powered Resume Intelligence & Candidate Screening Platform</strong>
 </p>
 
 <p align="center">
-  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
-  <a href="https://flask.palletsprojects.com"><img src="https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"></a>
-  <a href="https://github.com/Rohit122622/Nexus-CV"><img src="https://img.shields.io/badge/GitHub-Ready-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Ready"></a>
-  <br>
-  <a href="#"><img src="https://img.shields.io/badge/AI-Multi--Agent-8A2BE2?style=for-the-badge&logo=openai&logoColor=white" alt="Multi-Agent"></a>
-  <a href="#"><img src="https://img.shields.io/badge/RAG-FAISS-FF6F61?style=for-the-badge" alt="RAG"></a>
-  <a href="#"><img src="https://img.shields.io/badge/LLM-Fallback-008080?style=for-the-badge" alt="LLM Fallback"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-4CAF50?style=for-the-badge" alt="MIT License"></a>
+  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://flask.palletsprojects.com"><img src="https://img.shields.io/badge/Flask-3.x-000000?style=flat-square&logo=flask&logoColor=white" alt="Flask"></a>
+  <a href="#"><img src="https://img.shields.io/badge/XGBoost-ML_Scoring-FF6600?style=flat-square" alt="XGBoost"></a>
+  <a href="#"><img src="https://img.shields.io/badge/FAISS-Vector_Search-FF6F61?style=flat-square" alt="FAISS"></a>
+  <a href="#"><img src="https://img.shields.io/badge/spaCy-NLP-09A3D5?style=flat-square" alt="spaCy"></a>
+  <a href="#"><img src="https://img.shields.io/badge/RAG-BGE_large-8A2BE2?style=flat-square" alt="RAG"></a>
+  <a href="#"><img src="https://img.shields.io/badge/LLM-6_Provider_Fallback-008080?style=flat-square" alt="LLM Fallback"></a>
+  <a href="#"><img src="https://img.shields.io/badge/n8n-Workflow_Engine-EA4B71?style=flat-square&logo=n8n&logoColor=white" alt="n8n"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Auth-Google_OAuth-4285F4?style=flat-square&logo=google&logoColor=white" alt="OAuth"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-4CAF50?style=flat-square" alt="MIT License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" alt="Status"></a>
 </p>
 
 <p align="center">
-  <em>Nexus CV is an enterprise-grade career intelligence platform that leverages multi-agent orchestrations, hybrid machine learning, and semantic RAG pipelines to deliver comprehensive ATS scoring, deep resume-to-job-description alignment, automated resume rewriting, and bulk candidate screening.</em>
+  Nexus CV is a modular, AI-powered platform for resume analysis, ATS scoring, semantic job-description matching, bulk candidate screening, and AI-assisted proposal generation — built on a 6-agent pipeline, hybrid ML scoring, and a resilient 6-provider LLM fallback chain.
 </p>
 
----
+<br>
 
-## ⚡ Why Nexus CV is Different
+## Table of Contents
 
-Unlike simple keyword-matching ATS parsers or fragile, single-prompt LLM wrappers, **Nexus CV** brings a robust, defense-in-depth approach to resume intelligence:
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Screenshots](#screenshots)
+- [Architecture](#architecture)
+- [AI Pipeline](#ai-pipeline)
+- [Multi-Agent System](#multi-agent-system)
+- [Recruiter AI Copilot](#recruiter-ai-copilot)
+- [Hybrid Scoring Engine](#hybrid-scoring-engine)
+- [Bulk Resume Screening](#bulk-resume-screening)
+- [Resume Comparison](#resume-comparison)
+- [Resume Analysis](#resume-analysis)
+- [Tech Stack](#tech-stack)
+- [Folder Structure](#folder-structure)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Performance Notes](#performance-notes)
+- [Security](#security)
+- [Future Improvements](#future-improvements)
+- [Contributing](#contributing)
+- [License](#license)
 
-1. **Hybrid Scoring Engine:** Combines heuristic rules (TF-IDF, keyword density, completeness) with a custom-trained **XGBoost machine learning model** to predict candidate viability with high analytical precision.
-2. **4-Agent ReAct Pipeline:** Leverages specialized, collaborative LLM agents with native validation loops. The final verdict requires **strict evidence quotes** verified against actual text chunks.
-3. **Resilient Multi-Model Fallbacks:** Features an automated, thread-safe, and self-healing LLM chain starting at Google Gemini, falling back to Groq, and landing on localized rules to guarantee 100% service availability.
-4. **Self-Hosted Bulk Orchestration:** Combines a high-throughput Flask API with an asynchronous, self-hosted **n8n workflow engine** to extract, parse, clean, score, and rank batches of up to 50 resumes concurrently.
+<br>
 
----
+## Project Overview
 
-## ✨ Features Matrix
+Nexus CV addresses a real gap in resume tooling: most ATS tools are either pure keyword matchers or fragile single-prompt LLM wrappers. Nexus CV combines both approaches into a hybrid pipeline that is more reliable and analytically richer than either alone.
 
-Nexus CV implements a comprehensive feature matrix designed to address every aspect of modern resume evaluation and career guidance:
+The platform is built around three core ideas:
 
-| Feature Area | Sub-Feature | Status | Implementation Details |
-| :--- | :--- | :---: | :--- |
-| **Parsing & Analysis** | ✔ **ATS Scoring** | **Active** | Heuristic criteria + trained XGBoost regressor (7-feature vector) |
-| | ✔ **TF-IDF Scoring** | **Active** | Curated skill registries & role density matching (0-30 scale) |
-| | ✔ **Semantic JD Matching** | **Active** | BGE-large embedding similarity comparison against target JDs |
-| | ✔ **NLP Pipeline** | **Active** | spaCy entity recognition, text normalization, and grammar patterns |
-| **Advanced AI / RAG** | ✔ **Multi-Agent Reasoning** | **Active** | 4-agent collaborative pipeline (Skill, Experience, ATS, Decision) |
-| | ✔ **ReAct Agents** | **Active** | DecisionAgent utilizes a 2-iteration Reasoning & Action loop |
-| | ✔ **RAG Retrieval** | **Active** | FAISS vector index with skill/experience-heavy semantic chunk prioritization |
-| | ✔ **Multi-Model Gemini Fallback** | **Active** | Direct chain: `gemini-2.5-flash` ➔ `gemini-2.5-flash-lite` with retry logic |
-| | ✔ **Groq Fallback** | **Active** | Secondary LLM layer using Llama 3.3 (70B) for high-availability backup |
-| **Resume & Comparison** | ✔ **Resume Generation** | **Active** | Interactive resume builder with ATS optimization & Gemini rewrite |
-| | ✔ **Resume Comparison** | **Active** | Side-by-side versions diff, additions/deletions tracking, and gap analysis |
-| | ✔ **Role Prediction** | **Active** | Zero-shot multi-role classifier using fine-tuned BART-large models |
-| **Bulk Orchestration** | ✔ **Bulk Resume Screening** | **Active** | Concurrent batch parsing & ranking from ZIP archives up to 50 files |
-| | ✔ **XGBoost Hybrid Ranking** | **Active** | Multi-signal weighting formula integrating ML-derived scores |
-| | ✔ **n8n Orchestration** | **Active** | 11-node workflow with split-in-batches loop & per-file recovery |
-| | ✔ **Batch Processing** | **Active** | Parallel background uploads and asynchronous result ranking |
-| **Interface & Reports** | ✔ **Dashboard** | **Active** | Live analytics suite displaying metrics, best score, and history |
-| | ✔ **Session History** | **Active** | Persistent SQLite store with secure user registration and login |
-| | ✔ **PDF Reports** | **Active** | Beautiful, printable PDF reports compiled via ReportLab with auto-email |
-| | ✔ **Dark Mode UI** | **Active** | Modern glassmorphism UI with responsive design & smooth animations |
+**Hybrid scoring** — XGBoost ML predictions, TF-IDF keyword density, semantic BGE-large embeddings, and rule-based heuristics are combined into a single weighted ranking signal rather than relying on any one method.
 
----
+**Multi-agent reasoning** — Six specialist agents (Skill, Experience, ATS, Decision, Behavioral, Platform Activity) each evaluate a distinct dimension of the candidate, then the Decision Agent synthesizes their outputs using a ReAct reasoning loop with direct evidence quotes from the resume.
 
-## 🏗️ System Architecture
+**Resilient LLM infrastructure** — A 6-provider fallback chain (Gemini → Groq → OpenAI → Claude → DeepSeek → Qwen → local rules) with thread-safe throttling ensures AI features remain available even under quota exhaustion or API outages.
 
-Nexus CV employs a modular, decoupled architecture consisting of multiple interactive layers designed to guarantee security, performance, and maximum resilience.
+<br>
 
-```mermaid
-graph TD
-    %% Presentation Layer
-    subgraph Frontend [Presentation Layer]
-        UI[Glassmorphic UI / HTML5 & CSS3]
-        Theme[Theme Toggle / dark-mode]
-        Chart[Chart.js Visualizer]
-    end
+## Key Features
 
-    %% Application Layer
-    subgraph Backend [Application Layer]
-        Flask[Flask Server / WSGI]
-        Auth[OAuth 2.0 / Authlib]
-        Limiter[Flask-Limiter / Rate Guard]
-        CSRF[CSRF / Security Headers]
-    end
-    
+| Area | Feature |
+|------|---------|
+| **Analysis** | ATS Score Prediction, Semantic JD Matching, Role Prediction, Missing Skills Detection |
+| **AI Agents** | 6-Agent Pipeline — Skill, Experience, ATS, Decision, Behavioral, Platform Activity |
+| **Recruiter Tools** | Recruiter AI Copilot, Natural Language Candidate Q&A, Comparison Explanations |
+| **Bulk Screening** | ZIP Upload, Multi-Agent Parallel Analysis, 7-Signal Hybrid Ranking, Shortlisting |
+| **Resume Tools** | Resume Builder, Resume Comparison (diff + gap analysis), ATS-Optimized Rewriting |
+| **Roadmap** | Career Roadmap Generation, Role Prediction, Improvement Suggestions |
+| **Reports** | PDF Report Generation, CSV Export, JSON Export, Auto-Email via SendGrid |
+| **LLM Stack** | Gemini, Groq, OpenAI, Claude, DeepSeek, Qwen, Local Rule Fallback |
+| **Infrastructure** | n8n Workflow Orchestration, Google OAuth, Dark Mode UI, Dashboard Analytics |
 
-    %% Orchestration Layer
-    subgraph Orchestration [Orchestration Layer]
-        n8n[n8n Workflow Engine]
-        Queue[Background Worker / APScheduler]
-    end
+<br>
 
-    %% Intelligence & ML Layers
-    subgraph Intelligence [AI & ML Layers]
-        Router[Agent Controller]
-        subgraph Agents [Multi-Agent Pipeline]
-            SA[Skill Agent / Rule]
-            EA[Experience Agent / LLM]
-            AA[ATS Agent / XGBoost]
-            DA[Decision Agent / ReAct]
-        end
-        subgraph Models [LLM Fallback Chain]
-            Gemini1[gemini-2.5-flash]
-            Gemini2[gemini-2.5-flash-lite]
-            Groq[Groq Llama 3.3]
-            RuleBase[Local Safety Net]
-        end
-        subgraph ML [Machine Learning Core]
-            XGB[XGBoost Scorer]
-            Embed[BGE-large Embedding]
-            FAISS[FAISS Vector DB]
-            Chunker[Semantic Chunker]
-            spaCy[spaCy NLP Engine]
-        end
-    end
+## Screenshots
 
-    %% Storage Layer
-    subgraph Storage [Database & Storage Layer]
-        DB[(SQLite / SQLAlchemy)]
-        FS[Disk Storage / uploads & reports]
-    end
+### Landing Page
+*(Add Screenshot Here)*
 
-    %% Flow Connections
-    UI <-->|HTTPS / REST| Flask
-    Flask <--> DB
-    Flask <--> FS
-    Flask -->|Webhook / API Key| n8n
-    n8n -->|Batch API Call| Flask
-    Flask --> Router
-    Router --> Agents
-    SA & EA & AA & DA <--> Models
-    DA <--> ML
-    ML <--> FAISS
-    n8n <--> Queue
-```
+### Dashboard
+*(Add Screenshot Here)*
 
-### Architectural Breakdown
+### Resume Analyzer
+*(Add Screenshot Here)*
 
-#### 1. Frontend Layer
-* A highly optimized, responsive web interface built on vanilla CSS and modern JS.
-* Styled using **glassmorphic design principles**, supporting real-time theme switching (Dark/Light mode) without layout shifts.
-* Utilizes **Chart.js** to render dynamic score charts, keyword density radars, and historical ATS progress curves.
+### Eligibility / ATS Results
+*(Add Screenshot Here)*
 
-#### 2. Backend Layer
-* A secure, robust **Flask** application serving as the primary API controller, session manager, and static page renderer.
-* Hardened with comprehensive security mechanisms: **Flask-WTF CSRF validation**, rate limiting via **Flask-Limiter**, and strict response-level security headers (XSS, HSTS, Frame Options).
-* Supports standard authentication and secure social logins via **OAuth 2.0 (Google & Microsoft)**.
+### Recruiter AI Copilot
+*(Add Screenshot Here)*
 
-#### 3. AI Layer
-* Houses the collaborative **Multi-Agent Reasoner** that orchestrates specialist agents through a defined workflow.
-* Coordinates the multi-model **LLM fallback sequence**, ensuring automatic retry, thread-safe request throttling, and JSON output parsing normalization.
+### Bulk Screening Portal
+*(Add Screenshot Here)*
 
-#### 4. ML Layer
-* The core analytical powerhouse containing our custom-trained **XGBoost (XGBRegressor) model**, which evaluates candidates based on a 7-dimensional engineered feature space.
-* Manages text embeddings via **BGE-large-en-v1.5** (run locally or hosted via lightweight pipelines) to calculate accurate semantic similarities.
+### Resume Comparison
+*(Add Screenshot Here)*
 
-#### 5. RAG Layer
-* Powered by **FAISS**, this layer splits, chunks, indexes, and retrieves candidate resume sections.
-* Utilizes **semantic chunking** which respects document boundaries (e.g. keeps experience bullet points grouped under the corresponding company) rather than blindly splitting by character counts.
-* Prioritizes skill-dense and experience-heavy fragments to serve as contextual groundings for agent prompts.
+### Career Roadmap
+*(Add Screenshot Here)*
 
-#### 6. Orchestration Layer
-* Uses a self-hosted **n8n workflow server** to handle intensive, non-blocking asynchronous operations such as multi-file ZIP uploads.
-* Employs **APScheduler** background workers inside the Flask server to monitor file lifecycles and safely clean up uploads/reports directories every 6 hours.
+### PDF Report
+*(Add Screenshot Here)*
 
-#### 7. Database / Storage Layer
-* Uses a structured **SQLite database** mapped through **SQLAlchemy** to store user accounts, analysis histories, and generated metadata.
-* Coordinates local disk storage directories safely designated for short-lived PDFs and raw parsing intermediates.
+### n8n Workflow
+*(Add Screenshot Here)*
 
----
+<br>
 
-## 🛠️ AI / ML Stack
-
-Nexus CV organizes a sophisticated network of models, libraries, and frameworks to achieve both speed and analytical accuracy:
-
-* **Flask & Python:** Serves as the central application runtime and endpoint handler.
-* **FAISS (Facebook AI Similarity Search):** Provides ultra-fast local vector indices to perform inner-product searches during RAG operations.
-* **TF-IDF & RapidFuzz:** Computes exact and fuzzy keyword alignments, normalizing acronyms (e.g., "ML" matching "Machine Learning") and scoring critical skill density.
-* **XGBoost (XGBRegressor):** An ensemble gradient-boosting regressor trained on engineered features to predict candidate fit score adjustments based on structured historical patterns.
-* **spaCy (en_core_web_sm):** Executes deep natural language processing including POS tagging, entity recognition, and grammar parsing to isolate professional experience blocks.
-* **Sentence Transformers (BGE-large-en-v1.5):** Translates resumes and job descriptions into high-density 1024-dimensional vector spaces for semantic similarity analysis.
-* **Google Gemini API:** Primary generative model powering extensive resume rewriting, structured roadmap recommendations, and collaborative agent evaluation.
-* **Groq API:** Low-latency fallback host deploying Llama 3.3 (70B) to handle peak load queries or Gemini quota exhaustions.
-* **n8n:** Visual orchestrator managing multi-stage pipeline flow, split loops, and error-handling branches.
-* **Chart.js:** Client-side HTML5 canvas renderer producing sleek, interactively hovered resume analytical charts.
-* **pdfplumber & ReportLab:** Core document components—the former extracts clean text from multi-column resume PDFs while the latter compiles gorgeous, branded candidate analysis summaries.
-* **Regex Engine:** Performs structured cleaning, email/phone harvesting, and initial document structure detection.
-* **LLM Agents:** Collaborating instances of specialized AI bots executing under localized instructions to evaluate resume quality.
-
----
-
-## 🤖 Multi-Agent Pipeline
-
-Nexus CV splits complex candidate evaluation into a modular **4-Agent Pipeline** coordinate by an `AgentController` to eliminate bias and produce highly structured verdicts:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Controller as Agent Controller
-    participant Skill as Skill Agent (Rule)
-    participant Exp as Experience Agent (LLM)
-    participant ATS as ATS Agent (XGBoost)
-    participant Decision as Decision Agent (ReAct)
-
-    User->>Controller: Submit Resume + Job Description
-    Note over Controller: Init Pipeline
-    
-    Controller->>Skill: Pass Resume Chunks & Skill Registry
-    Note over Skill: Parse & Normalize Keywords<br/>Compare Cosine Embeddings
-    Skill-->>Controller: Return Skill Score (0-50) & Matches
-    
-    Controller->>Exp: Pass Resume Sections
-    Note over Exp: Analyze Career Progress<br/>Evaluate Metric Impact
-    Exp-->>Controller: Return Experience Insights & Bullet Highlights
-    
-    Controller->>ATS: Pass Engineered Features
-    Note over ATS: Run XGBoost Predictor<br/>Compute Completeness Score
-    ATS-->>Controller: Return ATS Structural Score (0-50)
-    
-    Controller->>Decision: Synthesize all Agent signals
-    Note over Decision: Loop 1: Gather Evidences<br/>Loop 2: Formulate Final Score<br/>Extract Direct Quotes
-    Decision-->>Controller: Return Verdict & Confidence Rating
-    
-    Controller->>User: Display Synthesized Dashboard & PDF Report
-```
-
-### The Specialist Agents
-1. **SkillAgent (Deterministic / Embedding):** Checks for technical and soft skill match-rates. It uses **BGE-large** embeddings to capture semantic synonyms and applies fuzzy matching to map colloquial phrasing to industry standards. No LLM calls are used, keeping it deterministic and fast.
-2. **ExperienceAgent (LLM-Assisted):** Evaluates career trajectory, leadership markers, and qualitative progression. It analyzes whether bullet points focus on responsibilities or tangible achievements using impact metrics (e.g., "reduced latency by 40%").
-3. **ATSAgent (Machine Learning):** Extracts 7 structural and statistical features and feeds them into the pre-trained **XGBoost regressor** alongside a standard section-completeness check.
-4. **DecisionAgent (ReAct Reasoning):** The pipeline's brain. It takes outputs from the previous three agents, reasons over their findings, extracts **direct verification quotes** from the resume, evaluates its own confidence (High/Medium/Low), and issues a final, mathematically aligned score and qualitative verdict.
-
-### ReAct (Reasoning and Action) Loop
-The **DecisionAgent** executes a 2-iteration ReAct loop:
-* **Thought 1:** "I have the Skill score (42/50), the Experience rating (Strong), and the ATS structural score (45/50). I need to determine if the candidate's core accomplishments support this high rating."
-* **Action 1:** Search FAISS for specific project achievements or experience bullet points.
-* **Observation 1:** Found chunk: *"Led a team of 4 engineers to rebuild the analytics pipeline using Flask and XGBoost."*
-* **Thought 2:** "The candidate has demonstrated hands-on leadership using our exact tech stack. I will formulate the final verdict, quote this evidence, and assign a High confidence level."
-* **Action 2:** Deliver the final unified response structure.
-
----
-
-## 🔍 RAG (Retrieval-Augmented Generation) System
-
-To guarantee high accuracy and completely eliminate model hallucination, Nexus CV implements a specialized localized **RAG System**:
+## Architecture
 
 ```
- ┌──────────────────────────────────────────────────────────┐
- │                     Raw Resume PDF                       │
- └──────────────────────────┬───────────────────────────────┘
-                            │ Chunking (Sentence-Aware)
+┌─────────────────────────────────────────────────────────┐
+│                 Presentation Layer                      │
+│     Glassmorphic UI — HTML5, CSS3, JS, Chart.js         │
+│     Dark Mode Toggle — LocalStorage-backed              │
+└───────────────────────────┬─────────────────────────────┘
+                            │ HTTPS / REST
                             ▼
- ┌──────────────────────────────────────────────────────────┐
- │    Section-Aware Chunks (Company, Projects, Skills)      │
- └──────────────────────────┬───────────────────────────────┘
-                            │ Embedding (BGE-large)
-                            ▼
- ┌──────────────────────────────────────────────────────────┐
- │          FAISS L2 Vector Index (Memory-Cached)           │
- └──────────────────────────┬───────────────────────────────┘
-                            │ User Query / Job Description
-                            ▼
- ┌──────────────────────────────────────────────────────────┐
- │            Prioritized Prompt Context Injection          │
- │   - Experience-Heavy (80% Weight)                        │
- │   - Skill-Heavy      (20% Weight)                        │
- └──────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                  Application Layer                      │
+│     Flask 3.x — Routing, Sessions, CSRF, Rate Limiting  │
+│     Google OAuth 2.0 — Social Authentication            │
+└──────┬──────────────────┬──────────────────┬────────────┘
+       │                  │                  │
+       ▼                  ▼                  ▼
+┌────────────┐   ┌────────────────┐   ┌─────────────────┐
+│ Auth /     │   │ Analysis /     │   │ Bulk Screening  │
+│ User Mgmt  │   │ Resume Routes  │   │ + n8n Webhook   │
+└────────────┘   └───────┬────────┘   └────────┬────────┘
+                         │                      │
+                         ▼                      ▼
+┌─────────────────────────────────────────────────────────┐
+│                 Intelligence Layer                      │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │            6-Agent Pipeline                     │    │
+│  │  Skill → Experience → ATS → Decision            │    │
+│  │  Behavioral → Platform Activity                 │    │
+│  └─────────────────────────────────────────────────┘    │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │         LLM Fallback Chain                      │    │
+│  │  Gemini → Groq → OpenAI → Claude                │    │
+│  │  → DeepSeek → Qwen → Local Rules               │    │
+│  └─────────────────────────────────────────────────┘    │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                    ML / RAG Layer                       │
+│  XGBoost Regressor   BGE-large Embeddings               │
+│  FAISS Vector Index  spaCy NLP   TF-IDF + RapidFuzz     │
+│  BART-MNLI Zero-Shot Classifier                         │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│               Database & Storage Layer                  │
+│     SQLite (SQLAlchemy ORM) — Users, History, Scores    │
+│     Local Disk — uploads/, reports/ (auto-pruned)       │
+└─────────────────────────────────────────────────────────┘
 ```
 
-* **Semantic Chunking:** Resumes are parsed by **pdfplumber** and parsed into logical sections using layout patterns. Instead of character-based limits, splitting occurs at logical boundary limits (e.g., company experience blocks or project cards) to preserve localized context.
-* **Section-Aware Retrieval:** Chunks are tagged with metadata identifying their source sections (e.g., `experience`, `skills`, `education`). 
-* **FAISS Vector Search:** Embeddings are generated using **BGE-large-en-v1.5** (1024 dimensions) and loaded into a local FAISS index. Inner-product distance is used to retrieve the top-k most relevant resume fragments matching a target Job Description.
-* **Context Prioritization:**
-  * **Skills-Heavy Prioritization:** Prompts analyzing technology alignments are supplied with raw chunks originating from the *Skills* and *Projects* sections.
-  * **Experience-Heavy Prioritization:** Prompts evaluating career progression and leadership are injected with prioritized, chronologically sorted chunks originating strictly from the *Work Experience* sections.
+<br>
 
----
+## AI Pipeline
 
-## ⛓️ Multi-Model LLM Fallback Chain
-
-To maintain high availability in production, Nexus CV uses a robust, multi-stage fallback orchestration to bypass rate limits (HTTP 429), API outages, and token restrictions:
+The AI pipeline processes every resume submission through a staged sequence before producing a final verdict.
 
 ```
-                  ┌──────────────────────┐
-                  │      LLM Request     │
-                  └──────────┬───────────┘
-                             │
-                    [Try Gemini 2.5 Flash]
-                    - 2 attempts
-                    - Thread-safe Lock
-                    - Throttled: 1.5s interval
-                             │
-            ┌────────────────┴────────────────┐
-         Success                            Fail (429/500)
-            │                                 │
-            ▼                                 ▼
-      [Return Data]              [Try Gemini 2.5 Flash Lite]
-                                 - 2 attempts
-                                 - Same throttle guard
-                                              │
-                             ┌────────────────┴────────────────┐
-                          Success                            Fail
-                             │                                 │
-                             ▼                                 ▼
-                       [Return Data]                  [Try Groq Llama 3.3]
-                                                      - 2 attempts
-                                                      - API Key Validation
-                                                               │
-                                              ┌────────────────┴────────────────┐
-                                           Success                            Fail
-                                              │                                 │
-                                              ▼                                 ▼
-                                        [Return Data]                 [Local Rule-Based]
-                                                                      - Offline Parser
-                                                                      - Safe Heuristics
-                                                                      - 100% Guaranteed
+Resume PDF + Job Description
+          │
+          ▼
+┌─────────────────────┐
+│   Resume Parser     │  pdfplumber — table-aware, multi-column extraction
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Semantic Chunker   │  Section-aware splitting (Experience, Skills, Projects)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Embedding Engine   │  BGE-large-en-v1.5 → 1024-dim vectors → FAISS Index
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────────────────────────────────────────┐
+│                  6-Agent Pipeline                       │
+│                                                         │
+│  [Skill Agent]        Keyword + semantic skill scoring  │
+│  [Experience Agent]   Career progression + impact eval  │
+│  [ATS Agent]          XGBoost structural scoring        │
+│  [Decision Agent]     ReAct synthesis + evidence quotes │
+│  [Behavioral Agent]   Soft skills + leadership signals  │
+│  [Platform Agent]     Activity pattern analysis         │
+└──────────┬──────────────────────────────────────────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  7-Signal Hybrid    │  Weighted composite score assembly
+│  Ranking Engine     │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Output Assembly    │  Dashboard + PDF Report + CSV/JSON Export
+└─────────────────────┘
 ```
 
-### Resilience Features
-* **Thread-Safe Throttle Lock:** A global thread lock (`_gemini_lock`) prevents concurrent requests from spamming the Gemini API. It enforces a strict **1.5-second minimum interval** between API hits to respect free-tier quotas.
-* **Double-Retry Guard:** Every API call is wrapped in a retry handler that allows up to **2 attempts** before stepping down to the next model in the chain.
-* **Unified Output Parser:** Regardless of which model services the request, responses are routed through a parser that executes `safe_json_parse()` and maps keys to a standardized output object containing unified `insights`, `suggestions`, `analysis`, and `score_reason` fields.
+<br>
 
----
+## Multi-Agent System
 
-## 📦 Bulk Resume Pipeline
+Six specialist agents collaborate under an `AgentController`. Each agent evaluates a distinct dimension; the Decision Agent synthesizes all signals into a final verdict.
 
-The **Bulk Resume Pipeline** handles high-throughput screening by parallelizing data processing and ranking up to 50 candidates in a single action:
+### Agent Descriptions
 
+**1. Skill Agent** *(Deterministic + Embedding)*
+Evaluates technical and soft skill alignment. Uses BGE-large embeddings to capture semantic synonyms (e.g. "ML" → "Machine Learning") and RapidFuzz for fuzzy surface matching. No LLM calls — fully deterministic and fast. Returns a skill match score and a list of matched and missing skills.
+
+**2. Experience Agent** *(LLM-Assisted)*
+Analyzes career trajectory, role progression, and bullet point quality. Distinguishes responsibility-focused bullets ("Managed a team") from impact-focused ones ("Reduced latency by 40%"). Returns experience quality insights and highlighted achievement markers.
+
+**3. ATS Agent** *(XGBoost ML)*
+Extracts 7 structural features from the resume — section completeness, keyword density, formatting signals, quantification presence, and more — and feeds them into the pre-trained `ats_xgb.pkl` XGBoost regressor. Returns an ATS structural score (0–50).
+
+**4. Decision Agent** *(ReAct Reasoning)*
+The synthesis layer. Takes outputs from all other agents, executes a 2-iteration ReAct reasoning loop, extracts direct evidence quotes from the resume text, evaluates its own confidence (High / Medium / Low), and produces the final unified score and qualitative verdict.
+
+**ReAct Loop Example:**
 ```
-  ┌────────────────────────────────────────────────────────┐
-  │                   1. ZIP Upload                        │
-  │   - Multi-file extraction                              │
-  │   - File extension & safety filter                     │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │               2. Pipeline 1 (Async)                    │
-  │   - Extract: pdfplumber plain text extraction          │
-  │   - Parse: Section headers & metadata cataloging        │
-  │   - Chunk: Segmenting text by experience/skills        │
-  │   - Embed: Generating semantic vector embeddings       │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │               3. Pipeline 2 (Parallel)                 │
-  │   - Agent Reasoning: Running core specialist agents    │
-  │   - Scoring: Hybrid ATS + TF-IDF calculation           │
-  │   - Ranking: Sorting by the 5-Signal Formula           │
-  │   - Shortlist: Isolating top-N candidates              │
-  └──────────────────────────┬─────────────────────────────┘
-                             │
-                             ▼
-  ┌────────────────────────────────────────────────────────┐
-  │             4. Visual Shortlist Dashboard              │
-  │   - Detailed match statistics and scores               │
-  │   - Fully downloadable batch report                    │
-  └────────────────────────────────────────────────────────┘
+Thought 1:  Skill score is 44/50, Experience is Strong, ATS is 46/50.
+            I need to verify whether the candidate's project work supports this.
+
+Action 1:   Search FAISS index for project and leadership evidence.
+
+Observation: "Led a team of 4 engineers to rebuild the analytics pipeline
+              using Flask and XGBoost — reduced processing time by 60%."
+
+Thought 2:  Direct evidence of leadership and relevant stack alignment found.
+            Confidence: High. Formulating final verdict.
+
+Action 2:   Deliver unified structured response.
 ```
 
-### The 5-Signal Hybrid Ranking Formula
-To rank bulk candidates fairly and comprehensively, a composite score is computed for each candidate:
-$$\text{Final Score} = (0.25 \times \text{Semantic similarity}) + (0.20 \times \text{ATS structural}) + (0.25 \times \text{Agent verdict}) + (0.15 \times \text{Skill registry overlap}) + (0.15 \times \text{XGBoost adjustment})$$
+**5. Behavioral Agent** *(LLM-Assisted)*
+Analyses soft skill signals — communication clarity, leadership language, collaboration indicators, and problem-solving framing — extracted from resume text. Returns a behavioral profile summary and soft skill gap flags.
 
----
+**6. Platform Activity Agent** *(Rule + LLM)*
+Evaluates external platform signals where available — GitHub contribution patterns, LinkedIn activity indicators, and portfolio presence. Flags candidates with strong public technical footprints. Returns an activity signal score and observations.
 
-## 🔄 n8n Workflow Integration
-
-For automated, self-hosted bulk processing, Nexus CV includes an **11-node production workflow** located at `n8n/bulk_resume_workflow.json`:
+### Agent Sequence Diagram
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Webhook   │ ──> │ Auth Guard  │ ──> │SplitInBatch │ ──> │ Pipeline 1  │
-│   Trigger   │     │ (API Key)   │     │ (Loop: N=1) │     │ (Data Parse)│
-└─────────────┘     └─────────────┘     └──────┬──────┘     └──────┬──────┘
-                                               ▲                   │
-                                               │   ┌─────────────┐ │
-                                               └── │ Pipeline 2  │ ◄
-                                                   │ (Agent Eval)│
-                                                   └─────────────┘
-                                                           │
-                                                           ▼
-                                                   ┌─────────────┐
-                                                   │   Ranking   │
-                                                   └──────┬──────┘
-                                                           │
-                                                           ▼
-                                                   ┌─────────────┐
-                                                   │  Response   │
-                                                   │ (JSON/Email)│
-                                                   └─────────────┘
+User ──► AgentController
+              │
+              ├──► Skill Agent        ──► Skill Score + Matches
+              ├──► Experience Agent   ──► Career Insights
+              ├──► ATS Agent          ──► XGBoost Structural Score
+              ├──► Behavioral Agent   ──► Soft Skill Profile
+              ├──► Platform Agent     ──► Activity Signals
+              │
+              └──► Decision Agent     ──► ReAct Loop
+                        │                  ├─ Synthesizes all signals
+                        │                  ├─ Extracts evidence quotes
+                        │                  └─ Confidence: High/Med/Low
+                        │
+                        ▼
+                Final Verdict + Score
 ```
 
-### Node-by-Node Explanation
-1. **Webhook Trigger (POST `/webhook/bulk-resume`):** Entry point accepting incoming multipart ZIP uploads and target Job Descriptions.
-2. **Auth Guard:** Validates headers using `NEXUS_API_KEY` to block unauthorized requests.
-3. **SplitInBatches (Batch Size = 1):** Sets up an efficient loop to parse one resume at a time, protecting memory and API rate limits.
-4. **Pipeline 1 (Data Extraction):** Extracts PDF text via localized tools and runs spaCy section classifiers.
-5. **Pipeline 2 (Agent Evaluation):** Dispatches the data to the Flask `/api/v1/score` endpoint to invoke the Multi-Agent pipeline.
-6. **Error Handler Boundary:** An adjacent fallback node that intercepts failures on individual corrupt PDFs and logs a placeholder candidate so the entire batch does not fail.
-7. **Ranking & Shortlist:** An active script node compiling scores and sorting candidates using the **5-Signal Formula**.
-8. **Response Node:** Returns a structured HTTP 200 payload containing the sorted list to the UI, while triggering an automated SendGrid email with a CSV list of the top-N candidates.
+<br>
 
-### Automatic Flask Triggering
-When a user uploads a ZIP on the **Bulk Screen** page, Flask saves the file, validates the schema, and immediately dispatches a background request containing the binary file and JD parameters to the self-hosted n8n webhook, returning a loading state to the user while listening for the final response.
+## Recruiter AI Copilot
 
----
+The Recruiter AI Copilot is a natural language interface built on top of the multi-agent pipeline, designed for recruiters to interrogate candidate data without writing queries or reading raw score breakdowns.
 
-## 📊 Tech Stack Mapping
+### Capabilities
 
-The following table maps every technology utilized in the codebase to its exact functional scope:
+**Natural Language Questions**
+Recruiters can ask plain-English questions about any candidate or set of candidates:
+- *"Why does Candidate A rank above Candidate B?"*
+- *"What skills is this candidate missing for a senior backend role?"*
+- *"Does this candidate show leadership experience?"*
+- *"Explain the ATS score for Resume #3."*
 
-| Technology | Functional Usage inside Nexus CV |
-| :--- | :--- |
-| **Flask** | Web routing, API endpoint security, session management, CSRF validation. |
-| **Python** | Primary development runtime, mathematical array processing, data pipeline orchestration. |
-| **FAISS** | Fast L2 similarity indices of resume paragraphs and skill matrices for local RAG lookup. |
-| **TF-IDF** | Term-frequency analysis to score keyword matches against role specifications. |
-| **XGBoost** | Predicts analytical candidate quality adjustments via a pre-trained `ats_xgb.pkl` regressor. |
-| **spaCy** | Evaluates sentence boundaries, normalizes parts of speech, and extracts entities (Names, Skills). |
-| **Sentence Transformers** | Local `bge-large-en-v1.5` execution to convert raw strings to 1024-d embeddings. |
-| **Gemini 2.5 Flash** | Multi-agent reasoning, evidence extraction, candidate suggestions, and objective rewriting. |
-| **Groq Llama 3.3** | High-performance secondary LLM layer to secure constant operational capacity. |
-| **n8n** | Parallel asynchronous processing of ZIP archives, file splits, and auto-email triggers. |
-| **Chart.js** | Visualizes dynamic analytical radars, progress line graphs, and bar metrics on the dashboard. |
-| **pdfplumber** | Extracts clean, multi-column and table-aware textual content from resumes without layout breakage. |
-| **Regex** | Validates structural fields (emails, URLs, phone numbers) and parses command sections. |
-| **LLM Agents** | Custom instructions executed over sub-components to analyze specific aspects of candidate applications. |
+**Candidate Comparison**
+Side-by-side reasoning across two or more candidates. The Copilot explains score differentials by referencing specific evidence — skill gaps, experience quality differences, and behavioral signal contrasts — rather than just returning raw numbers.
 
----
+**Missing Skills Analysis**
+Given a target job description, the Copilot returns a structured breakdown of which required skills are present, partially matched, or absent — with semantic awareness (so "PyTorch" and "deep learning framework" are understood as related).
 
-## 🚀 Installation & Setup
+**Leadership Analysis**
+The Behavioral Agent's output is surfaced through the Copilot to answer questions about leadership signals — team size, project ownership language, mentorship indicators, and decision-making framing in bullet points.
 
-Follow these clean, professional steps to run Nexus CV locally:
+**ATS Explanation**
+The Copilot can explain why a candidate received a particular ATS score in plain English, citing the specific structural factors (missing sections, low keyword density, lack of quantified achievements) that drove the result.
+
+**LLM-First, Rule Fallback**
+Responses are generated by the active LLM in the fallback chain. If all LLM providers are unavailable, the Copilot falls back to a structured rule engine that generates templated but accurate responses from the raw agent output data.
+
+<br>
+
+## Hybrid Scoring Engine
+
+Every candidate receives a composite score assembled from **7 independent signals**. Each signal captures a different analytical dimension, making the final ranking more robust than any single method alone.
+
+### The 7-Signal Formula
+
+$$\text{Final Score} = w_1 S_{\text{semantic}} + w_2 S_{\text{ATS}} + w_3 S_{\text{agent}} + w_4 S_{\text{skill}} + w_5 S_{\text{xgb}} + w_6 S_{\text{behavioral}} + w_7 S_{\text{platform}}$$
+
+| Signal | Weight | Description |
+|--------|--------|-------------|
+| **Semantic Similarity** | 0.25 | BGE-large cosine similarity between resume embeddings and target JD |
+| **ATS Structural Score** | 0.20 | XGBoost-predicted structural quality from 7 engineered features |
+| **Agent Verdict** | 0.20 | Decision Agent's synthesized score with evidence-backed confidence weighting |
+| **Skill Registry Overlap** | 0.15 | TF-IDF + fuzzy keyword match rate against role-specific skill taxonomy |
+| **XGBoost Adjustment** | 0.10 | Secondary XGBoost signal on completeness and formatting features |
+| **Behavioral Score** | 0.05 | Soft skill signal quality from Behavioral Agent |
+| **Platform Activity** | 0.05 | External presence signals (GitHub, LinkedIn, portfolio indicators) |
+
+Weights are configurable per role profile in `data/job_roles.json`.
+
+<br>
+
+## Bulk Resume Screening
+
+The bulk screening pipeline handles ZIP archives of up to 50 resumes, processing them concurrently through the full multi-agent stack and returning a ranked shortlist.
+
+### Pipeline Flow
+
+```
+1. ZIP Upload
+   └── File extension validation + safety filter
+   └── Extraction to secure temp directory
+
+2. Parsing Stage (Async per file)
+   └── pdfplumber extraction (multi-column aware)
+   └── Section header detection and metadata cataloging
+   └── Semantic chunking by section boundaries
+   └── BGE-large embedding generation
+
+3. Analysis Stage (Parallel)
+   └── 6-Agent pipeline per candidate
+   └── 7-Signal hybrid score computation
+   └── Per-candidate confidence rating
+
+4. Ranking & Shortlisting
+   └── Candidates sorted by composite score
+   └── Top-N shortlist isolated
+   └── Corrupt/unreadable files logged with placeholder, batch continues
+
+5. Output
+   └── Visual shortlist dashboard
+   └── CSV export of ranked candidates
+   └── JSON export for downstream integration
+   └── Optional auto-email via SendGrid
+```
+
+### n8n Orchestration
+
+Bulk processing is handled by an **11-node self-hosted n8n workflow** (`n8n/bulk_resume_workflow.json`):
+
+```
+Webhook Trigger
+     │
+     ▼
+Auth Guard (API Key validation)
+     │
+     ▼
+SplitInBatches (N=1, memory-safe loop)
+     │
+     ▼
+Pipeline 1 (Extraction + Parsing)
+     │
+     ▼
+Pipeline 2 (Agent Analysis + Scoring)     ◄── Error Handler Boundary
+     │                                         (corrupt files logged,
+     ▼                                          batch continues)
+Ranking Script Node
+     │
+     ▼
+Response Node (JSON payload → UI + optional CSV email)
+```
+
+When a ZIP is uploaded via the Bulk Screen page, Flask saves the file, validates the schema, and dispatches a background webhook request to n8n. The UI enters a loading state and polls for the final ranked response.
+
+<br>
+
+## Resume Comparison
+
+The Resume Comparison feature performs a structured diff analysis between two versions of a resume — useful for tracking improvement between edits or comparing a tailored version against the original.
+
+### What It Compares
+
+**ATS Score Comparison**
+Both versions are independently scored through the ATS Agent. The delta is displayed with a directional indicator (improved / regressed / unchanged).
+
+**Skills Diff**
+Tracks which skills were added and which were removed between versions. Categorized by skill type (technical, soft, tools) using the skill taxonomy.
+
+**Gemini Analysis**
+The active LLM evaluates the two versions qualitatively — identifying which changes were impactful, which were cosmetic, and which introduced new gaps.
+
+**Improvement Suggestions**
+Based on the diff and the target JD (if provided), the Copilot generates a prioritized list of remaining improvements the candidate should make to the newer version.
+
+**Comparison Report**
+A downloadable PDF summarizing the diff, score delta, skills changes, and AI suggestions — generated by `compare_pdf_generator.py` via ReportLab.
+
+<br>
+
+## Resume Analysis
+
+Single-resume analysis is the core workflow. A candidate uploads their resume and optionally provides a target job description.
+
+### What the Analysis Covers
+
+**ATS Score**
+The ATS Agent extracts 7 structural features and runs the XGBoost regressor to produce a score reflecting how well the resume is structured for automated parsing systems.
+
+**Semantic JD Match**
+BGE-large embeddings are generated for both the resume and the JD. Cosine similarity across FAISS-indexed chunks produces a semantic match percentage — capturing alignment that keyword matching misses.
+
+**Role Prediction**
+BART-large-MNLI performs zero-shot classification across a taxonomy of job roles, predicting the top candidate role fits without requiring explicit role input from the user.
+
+**Career Roadmap**
+Based on the predicted role, current skills, and detected experience level, the `career_recommender.py` module generates a structured progression roadmap — next roles, skills to acquire, and estimated timelines.
+
+**Missing Skills**
+The Skill Agent compares the candidate's skill set against the target role's required skill registry. Missing skills are ranked by importance weight from `skills_taxonomy.json`.
+
+**Improvement Suggestions**
+The active LLM generates structured, prioritized suggestions for improving the resume — covering content quality, quantification, section completeness, and keyword alignment.
+
+<br>
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | HTML5, CSS3 (Glassmorphic), JavaScript, Chart.js |
+| **Backend** | Python 3.10+, Flask 3.x, SQLAlchemy ORM |
+| **Database** | SQLite (local), structured via SQLAlchemy |
+| **Authentication** | Google OAuth 2.0 (Authlib), Flask-Login, bcrypt |
+| **AI — Primary** | Google Gemini 2.5 Flash / Flash Lite |
+| **AI — Fallback** | Groq (Llama 3.3 70B), OpenAI, Claude, DeepSeek, Qwen |
+| **AI — Local Fallback** | Rule-based heuristic engine (offline, no API required) |
+| **ML Models** | XGBoost (XGBRegressor), BART-large-MNLI (zero-shot) |
+| **NLP** | spaCy (en_core_web_sm), TF-IDF, RapidFuzz |
+| **Embeddings** | BGE-large-en-v1.5 (Sentence Transformers, 1024-dim) |
+| **Vector Search** | FAISS (L2 similarity index, memory-cached) |
+| **PDF Processing** | pdfplumber (extraction), ReportLab (generation) |
+| **Orchestration** | n8n (self-hosted, 11-node bulk workflow) |
+| **Task Scheduling** | APScheduler (background cleanup daemon) |
+| **Email** | SendGrid API |
+| **Security** | Flask-WTF (CSRF), Flask-Limiter, input sanitization |
+| **Exports** | CSV, JSON, PDF |
+
+<br>
+
+## Folder Structure
+
+```
+Nexus-CV/
+├── run.py                          # Flask entrypoint — starts server on localhost:5000
+├── requirements.txt                # Project dependencies
+├── .env.example                    # Environment variable template
+├── .gitignore
+├── LICENSE
+├── README.md
+├── CONTRIBUTING.md
+│
+├── backend/
+│   ├── app.py                      # Flask app factory, routes, security middleware
+│   ├── database.py                 # SQLite schema and SQLAlchemy session management
+│   ├── agent_controller.py         # Orchestrates 6-agent pipeline execution
+│   └── input_validator.py          # Request sanitization and injection prevention
+│
+├── frontend/
+│   ├── static/
+│   │   ├── style.css               # Glassmorphic stylesheet with dark mode
+│   │   ├── script.js               # AJAX handling, dynamic UI updates
+│   │   ├── theme.js                # LocalStorage-backed dark/light toggle
+│   │   ├── favicon.svg
+│   │   ├── nexuscv-logo.svg
+│   │   └── google.svg
+│   └── templates/
+│       ├── base.html               # Master layout (nav, theme loaders)
+│       ├── home.html
+│       ├── dashboard.html
+│       ├── upload.html
+│       ├── result.html
+│       ├── bulk_screen.html
+│       ├── bulk_result.html
+│       ├── resume_builder.html
+│       ├── resume_preview.html
+│       ├── compare.html
+│       ├── compare_result.html
+│       ├── history.html
+│       ├── login.html
+│       ├── register.html
+│       ├── 404.html
+│       └── 500.html
+│
+├── services/
+│   ├── pipeline.py                 # 2-stage analysis workflow orchestrator
+│   ├── ai/
+│   │   ├── multi_llm.py            # 6-provider fallback chain with thread throttling
+│   │   ├── gemini_agent.py         # Gemini-specific prompt formatting
+│   │   ├── agent_reasoner.py       # ReAct loop management and output compilation
+│   │   └── agents/
+│   │       ├── skill_agent.py
+│   │       ├── experience_agent.py
+│   │       ├── ats_agent.py
+│   │       ├── decision_agent.py
+│   │       ├── behavioral_agent.py
+│   │       └── platform_activity_agent.py
+│   ├── ml/
+│   │   ├── ats_scorer.py           # Base scoring algorithms and model loaders
+│   │   ├── model_hub.py            # In-memory model cache (BGE-large, XGBoost)
+│   │   ├── skill_registry.py       # Role-to-skill cluster mappings
+│   │   └── embedding_cache.py      # Per-chunk embedding memoization
+│   └── processing/
+│       ├── resume_parser.py        # pdfplumber-based PDF extraction
+│       ├── resume_builder.py       # Input-to-JSON resume normalization
+│       ├── bulk_screener.py        # Concurrent multi-file evaluation
+│       ├── semantic_chunker.py     # Section-boundary-aware text splitting
+│       ├── career_recommender.py   # Role-based roadmap generation
+│       ├── jd_matcher.py           # JD-to-resume vector comparison
+│       ├── multi_role_predictor.py # BART-MNLI zero-shot role classification
+│       ├── resume_insights.py      # Keyword strength and weakness extraction
+│       ├── resume_suggestions.py   # Structural improvement recommendations
+│       ├── pdf_generator.py        # ReportLab analysis PDF generation
+│       ├── compare_pdf_generator.py
+│       └── email_sender.py         # SendGrid email dispatch
+│
+├── model/
+│   └── ats_xgb.pkl                 # Trained XGBRegressor artifact
+│
+├── data/
+│   ├── career_paths.json
+│   ├── job_roles.json
+│   ├── skills.txt                  # 15,000+ normalized technical keywords
+│   ├── skills_taxonomy.json
+│   └── rag/
+│       ├── resume_samples.json
+│       └── jd_samples.json
+│
+├── utils/
+│   ├── bias_filter.py              # PII anonymization for LLM prompts
+│   ├── cleanup.py                  # APScheduler file pruning daemon
+│   ├── json_utils.py               # Safe JSON parsing helpers
+│   ├── pdf_utils.py                # ReportLab styling constants
+│   ├── rag_store.py                # FAISS index management interface
+│   └── skill_normalizer.py         # Skill surface form normalization
+│
+├── n8n/
+│   └── bulk_resume_workflow.json   # 11-node bulk screening workflow blueprint
+│
+├── docs/
+│   └── Nexus_CV_Project_Report.md
+│
+├── uploads/                        # Temp resume storage (gitignored, auto-pruned)
+├── reports/                        # Generated PDF storage (gitignored, auto-pruned)
+└── logs/                           # Application error logs (gitignored)
+```
+
+<br>
+
+## Installation
 
 ### Prerequisites
-* Python 3.10 or 3.11 installed.
-* Node.js / npx (optional — required only for running local n8n workflows).
-* Git.
+
+- Python 3.10 or 3.11
+- Git
+- Node.js / npx (optional — only required for local n8n bulk screening)
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Rohit122622/Nexus-CV.git
 cd Nexus-CV
 ```
 
 ### 2. Create and Activate a Virtual Environment
-**On Windows:**
-```powershell
-python -m venv venv
-venv\Scripts\activate
-```
 
-**On macOS/Linux:**
+**Linux / macOS:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
+**Windows (PowerShell):**
+```powershell
+python -m venv venv
+venv\Scripts\activate
+```
+
 ### 3. Install Dependencies
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Download spaCy NLP Model
+### 4. Download the spaCy Model
+
 ```bash
 python -m spacy download en_core_web_sm
 ```
 
-### 5. Configure the Environment
-Copy the env template and customize your keys:
+### 5. Configure Environment Variables
+
 ```bash
 cp .env.example .env
 ```
-Open `.env` in your editor and input your API keys (see [Environment Configuration](#-environment-configuration)).
+
+Open `.env` and fill in your API keys. See [Environment Variables](#environment-variables) below.
 
 ### 6. Run the Application
-Start the Flask web backend:
+
 ```bash
 python run.py
 ```
-Open your browser and navigate to **`http://localhost:5000`** to view the platform!
 
-### 7. Run n8n (Optional — For Bulk Processing)
-If you wish to run the bulk resume screening engine locally:
+Open `http://localhost:5000` in your browser.
+
+### 7. Run n8n (Optional — Bulk Screening Only)
+
 ```bash
 npx n8n
 ```
-1. Open n8n in your browser (usually `http://localhost:5678`).
-2. Click **Import from File** and select `n8n/bulk_resume_workflow.json`.
-3. Save the workflow and toggle it to **Active**.
 
----
+Open `http://localhost:5678`, click **Import from File**, select `n8n/bulk_resume_workflow.json`, save, and toggle the workflow to **Active**.
 
-## ⚙️ Environment Configuration
+<br>
 
-Nexus CV relies on a structured `.env` file for API authentication and system settings. 
+## Environment Variables
 
-| Key | Example Value | Type | Description |
-| :--- | :--- | :---: | :--- |
-| **SECRET_KEY** | `d8a2...3f1e` | **Required** | Secures Flask sessions, cookie signing, and CSRF protection. |
-| **FLASK_ENV** | `development` / `production` | Optional | Controls debug logs, route reloading, and verbose error output. |
-| **GEMINI_API_KEY** | `AIzaSy...` | **Required\*** | API key for Gemini. *Must set either Gemini or Groq to enable AI. |
-| **GROQ_API_KEY** | `gsk_...` | **Required\*** | API key for Groq fallback. *Must set either Gemini or Groq. |
-| **OPENAI_API_KEY** | `sk-proj-...` | Optional | Enables OpenAI GPT-4o-mini as a high-tier fallback alternative. |
-| **CLAUDE_API_KEY** | `sk-ant-...` | Optional | Enables Anthropic Claude models in the fallback sequence. |
-| **DEEPSEEK_API_KEY**| `sk-ds-...` | Optional | Enables DeepSeek models in the fallback sequence. |
-| **QWEN_API_KEY** | `sk-qw-...` | Optional | Enables Qwen models in the fallback sequence. |
-| **NEXUS_API_KEY** | `custom_shared_secret` | Optional | Shared API key validating n8n webhooks back to Flask. |
-| **GOOGLE_CLIENT_ID**| `xxx.apps.googleusercontent.com` | Optional | Google OAuth 2.0 client ID for social registration. |
-| **GOOGLE_CLIENT_SECRET**| `GOCSPX-xxx` | Optional | Google OAuth 2.0 client secret. |
-| **SENDGRID_API_KEY**| `SG.xxx` | Optional | SendGrid API key to automatically dispatch generated PDF reports. |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SECRET_KEY` | **Yes** | Flask session and CSRF signing secret. Use a long random string. |
+| `FLASK_ENV` | No | `development` or `production`. Controls debug output and reloading. |
+| `GEMINI_API_KEY` | **Yes*** | Google Gemini API key. Primary LLM provider. |
+| `GROQ_API_KEY` | **Yes*** | Groq API key. Secondary LLM fallback (Llama 3.3 70B). |
+| `OPENAI_API_KEY` | No | OpenAI API key. Tertiary LLM fallback. |
+| `CLAUDE_API_KEY` | No | Anthropic Claude API key. Fourth fallback. |
+| `DEEPSEEK_API_KEY` | No | DeepSeek API key. Fifth fallback. |
+| `QWEN_API_KEY` | No | Qwen API key. Sixth fallback. |
+| `NEXUS_API_KEY` | No | Shared secret for authenticating n8n → Flask webhook calls. |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth 2.0 client ID for social login. |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth 2.0 client secret. |
+| `SENDGRID_API_KEY` | No | SendGrid key for automated PDF email delivery. |
 
----
+> *At least one of `GEMINI_API_KEY` or `GROQ_API_KEY` is required to enable LLM features. If neither is set, the platform falls back to the local rule-based engine automatically.
 
-## 🔌 API Endpoints
+> Never commit your `.env` file. It is excluded via `.gitignore`.
 
-Nexus CV exposes a clean REST API enabling programmatic candidate analysis and integration with external HR systems:
+<br>
 
-### `GET /api/v1/health`
-* **Description:** Health check endpoint to verify database and ML model loading status.
-* **Response (200):**
-  ```json
-  {
-    "status": "healthy",
-    "timestamp": "2026-05-28T23:30:00Z",
-    "components": {
-      "database": "connected",
-      "xgb_model": "loaded",
-      "embedding_model": "ready"
-    }
+## API Endpoints
+
+### Health Check
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/health` | Public | Returns database and ML model status |
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "components": {
+    "database": "connected",
+    "xgb_model": "loaded",
+    "embedding_model": "ready"
   }
-  ```
-
-### `POST /api/v1/score`
-* **Description:** Run full ATS and Multi-Agent scoring on a candidate's resume text.
-* **Headers:** `Content-Type: application/json`
-* **Request Body:**
-  ```json
-  {
-    "resume_text": "Experienced Python Engineer specialized in Flask and Machine learning...",
-    "job_description": "We are looking for a Backend developer with Python, Flask, and XGBoost experience.",
-    "role": "Backend Engineer",
-    "run_agents": true
-  }
-  ```
-* **Response (200):**
-  ```json
-  {
-    "status": "success",
-    "ats_score": 88.5,
-    "confidence_level": "High",
-    "verdict": "Highly qualified candidate demonstrating deep alignment with the required backend stack.",
-    "skill_matches": ["Python", "Flask", "Machine Learning"],
-    "missing_skills": ["Docker"],
-    "evidence_quotes": [
-      "Led backend development using Python and Flask",
-      "Built and deployed custom machine learning algorithms"
-    ]
-  }
-  ```
-
-### `POST /api/v1/bulk-rank`
-* **Description:** Asynchronously dispatch a ZIP file to n8n for bulk resume ranking.
-* **Request:** `multipart/form-data` with files `zip_file` and text field `job_description`.
-* **Response (200):**
-  ```json
-  {
-    "task_id": "bulk_8f9e2b1",
-    "status": "processing",
-    "candidates_count": 14,
-    "eta_seconds": 45
-  }
-  ```
-
----
-
-## 📸 Screenshots
-
-Modern glassmorphic screenshots highlight the beautiful user experience of the platform.
-
-```
-assets/screenshots/
-├── 1_home_dashboard.png      <-- Sleek landing page displaying core statistics and system capabilities
-├── 2_analyze_screen.png     <-- Interactive resume-to-JD analyzer with real-time text parsing
-├── 3_results_insights.png    <-- Multi-agent reasoning verdicts, keyword densities, and BGE scores
-├── 4_resume_builder.png     <-- Live PDF builder featuring real-time AI-optimized rewriting
-├── 5_resume_compare.png     <-- Visual side-by-side ATS diff showing skill additions/deletions
-├── 6_bulk_screening.png     <-- ZIP upload portal and parallel execution dashboard
-├── 7_n8n_pipeline.png        <-- Visual layout of the 11-node orchestration workflow
-└── 8_pdf_report_mock.png    <-- Print-ready analytical PDF report distributed to stakeholders
+}
 ```
 
----
+### Resume Scoring
 
-## 📂 Project Structure
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/v1/score` | Session | Run full 6-agent + hybrid scoring on a resume |
 
-```
-c:\Rohit\projects\AI_Resume_Analyzer/
-├── run.py                           # Application entry point — starts Flask on localhost:5000
-├── requirements.txt                 # Unified project dependencies
-├── .env.example                     # Environment variables configuration template
-├── .gitignore                       # Structured Git exclusions (removes .env, uploads, builds)
-├── LICENSE                          # MIT License
-├── README.md                        # High-grade technical documentation (This file)
-├── CONTRIBUTING.md                  # Detailed open-source contribution guidelines
-├── CHANGELOG.md                     # Semantic version history tracker
-│
-├── backend/                         # Flask Core & Route Management
-│   ├── app.py                       # Main Flask app initialization, routes, security guards
-│   ├── database.py                  # SQLite schema definitions & SQLAlchemy wrappers
-│   ├── agent_controller.py          # Orchestrates flow execution between Multi-Agents
-│   └── input_validator.py           # Request payload filters & string sanitizers
-│
-├── frontend/                        # Presentation Layer Assets
-│   ├── static/                      # Static client-side assets
-│   │   ├── style.css                # Premium Glassmorphic stylesheet (Dark mode optimized)
-│   │   ├── script.js                # Core JS managing dynamic asynchronous AJAX submissions
-│   │   ├── theme.js                 # LocalStorage-backed dark/light toggle system
-│   │   ├── favicon.svg              # SVG high-res browser tab icon
-│   │   ├── nexuscv-logo.svg         # Clean geometric application vector logo
-│   │   └── google.svg               # SVG brand asset for Social OAuth buttons
-│   └── templates/                   # Secure Jinja2 HTML templates
-│       ├── base.html                # Boilerplate master frame (navigation, theme loaders)
-│       ├── home.html                # Professional startup-grade landing/hero section
-│       ├── dashboard.html           # Live stats reporting & user history graphs
-│       ├── upload.html              # Drag-and-drop resume upload module
-│       ├── result.html              # Multi-agent analytical results layout
-│       ├── bulk_screen.html         # High-volume ZIP screening portal
-│       ├── bulk_result.html         # Sorted scoreboard listing top-N candidates
-│       ├── resume_builder.html      # Dynamic forms targeting resume generation
-│       ├── resume_preview.html      # Sandbox containing live, styled resume previews
-│       ├── compare.html             # Multi-version upload form for side-by-side comparison
-│       ├── compare_result.html      # Highlights delta changes and gap resolutions
-│       ├── history.html             # Historical dashboard log of past analyses
-│       ├── login.html               # Clean username/password authentication card
-│       ├── register.html            # Registration form featuring strength validation
-│       ├── 404.html                 # Stylized page-not-found handler
-│       └── 500.html                 # Graceful application-crash recovery display
-│
-├── services/                        # Service & Engine Modules
-│   ├── pipeline.py                  # Orchestrates the 2-Stage Analysis workflow
-│   ├── ai/                          # LLM & Multi-Agent systems
-│   │   ├── multi_llm.py             # Resilient fallback chain with thread throttling
-│   │   ├── gemini_agent.py          # Formulates system prompts specific to Google Gemini
-│   │   ├── agent_reasoner.py        # Compiles and monitors multi-agent ReAct decisions
-│   │   └── agents/                  # Specialized autonomous agents
-│   │       ├── skill_agent.py       # Deterministic keyword & semantic embedding reviewer
-│   │       ├── experience_agent.py  # Evaluates role progression and metric markers
-│   │       ├── ats_agent.py         # Wraps the local XGBoost regressor results
-│   │       └── decision_agent.py    # Merges insights & verifies evidence-quotes
-│   ├── ml/                          # Analytical & vector processing
-│   │   ├── ats_scorer.py            # Computes base scoring algorithms and model loaders
-│   │   ├── model_hub.py             # Locally caches & serves Sentence Transformer embeddings
-│   │   ├── skill_registry.py        # Maps job positions to critical technical clusters
-│   │   └── embedding_cache.py       # Caches embeddings in-memory to prevent redundant calls
-│   └── processing/                  # File handlers & generator engines
-│       ├── resume_parser.py         # Table-aware PDF plain text extractor via pdfplumber
-│       ├── resume_builder.py        # Formats candidate inputs into clean, normalized JSON
-│       ├── bulk_screener.py         # Concurrently handles multi-file evaluation tasks
-│       ├── semantic_chunker.py      # Divides text along layout and semantic boundaries
-│       ├── career_recommender.py    # Formulates dynamic developmental roadmaps
-│       ├── jd_matcher.py            # Compares vectors to score job-to-resume matching
-│       ├── multi_role_predictor.py  # Evaluates candidate versatility using zero-shot ML
-│       ├── resume_insights.py       # Extracts strong keywords and areas of weakness
-│       ├── resume_suggestions.py    # Generates structural improvement recommendations
-│       ├── pdf_generator.py         # Generates fully styled analysis report PDFs
-│       ├── compare_pdf_generator.py # Formulates version comparison reports as PDFs
-│       └── email_sender.py          # Handles automated PDF distribution via SendGrid
-│
-├── model/                           # Pre-trained ML Weight files
-│   └── ats_xgb.pkl                  # Trained XGBRegressor serial artifact
-│
-├── data/                            # System reference dictionaries & RAG stores
-│   ├── career_paths.json            # Hierarchical mappings defining career progressions
-│   ├── job_roles.json               # Structured position taxonomies with skill requirements
-│   ├── skills.txt                   # Dictionary of 15,000+ normalized technical keywords
-│   ├── skills_taxonomy.json         # Maps skills to distinct functional groups
-│   └── rag/                         # Context stores grounding Agent prompts
-│       ├── resume_samples.json      # De-identified resume text fragments
-│       └── jd_samples.json          # Curated high-quality industry JDs
-│
-├── utils/                           # Shared utility modules
-│   ├── bias_filter.py               # Anonymizes candidates by filtering names and emails
-│   ├── cleanup.py                   # Automated task routine deleting temporary uploads
-│   ├── json_utils.py                # Safe JSON loaders preventing malformed token crashes
-│   ├── pdf_utils.py                 # Core styling variables and fonts used by ReportLab
-│   ├── rag_store.py                 # Direct interface managing FAISS vector indexes
-│   └── skill_normalizer.py          # Normalizes skill forms (e.g., JS ➔ JavaScript)
-│
-├── n8n/                             # Self-hosted orchestrations
-│   └── bulk_resume_workflow.json    # The production 11-node bulk screening blueprint
-│
-├── docs/                            # Technical reports & manuals
-│   └── Nexus_CV_Project_Report.md   # Architectural and algorithmic project paper
-│
-├── uploads/                         # Temporary raw resume storage (Gitignored)
-├── reports/                         # Generated report storage (Gitignored)
-└── logs/                            # Local application error logging target (Gitignored)
+**Request:**
+```json
+{
+  "resume_text": "...",
+  "job_description": "...",
+  "role": "Backend Engineer",
+  "run_agents": true
+}
 ```
 
----
+**Response:**
+```json
+{
+  "status": "success",
+  "ats_score": 88.5,
+  "confidence_level": "High",
+  "verdict": "Strong alignment with the target role...",
+  "skill_matches": ["Python", "Flask", "XGBoost"],
+  "missing_skills": ["Docker", "Kubernetes"],
+  "evidence_quotes": ["Led backend development using Python and Flask"]
+}
+```
 
-## ⚡ Performance & Production Features
+### Bulk Screening
 
-Nexus CV is designed from the ground up for high reliability under peak load conditions:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/v1/bulk-rank` | Session | Submit ZIP for async n8n bulk processing |
 
-* **Robust Resource Management:** Local models (BGE-large and spaCy) are loaded once and cached in-memory inside the `model_hub`, eliminating initialization overhead on standard requests.
-* **Embeddings Caching:** An active in-memory cache system (`embedding_cache.py`) checks if a resume chunk has been embedded previously. If a match is found, it bypasses transformer execution, reducing local CPU load by up to **80%** on consecutive edits.
-* **Automatic File Pruning:** The backend schedules an **APScheduler** background daemon (`utils/cleanup.py`) that executes every 6 hours to find and safely remove temporary PDFs inside the `uploads/` and `reports/` folders, ensuring zero disk-bloat.
-* **Fail-Safe Response Wrappers:** Every service API incorporates fallback structures that return structural JSON shells during unexpected exceptions, ensuring the user interface never crashes.
+**Request:** `multipart/form-data` — fields: `zip_file`, `job_description`
 
----
+**Response:**
+```json
+{
+  "task_id": "bulk_8f9e2b1",
+  "status": "processing",
+  "candidates_count": 14,
+  "eta_seconds": 45
+}
+```
 
-## 🔒 Production Hardening & Security Practices
+### Recruiter Copilot
 
-Enterprise safety is built into every layer of the Nexus CV application:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/v1/copilot/query` | Session | Submit a natural language recruiter question |
 
-* **Anonymization Engine (Bias Filter):** To support unbiased hiring practices, candidate names, precise locations, and personal links are dynamically replaced in agent prompts using the `bias_filter.py` anonymizer, rendering the LLM completely objective.
-* **Rate Guarding:** Endpoints are wrapped with **Flask-Limiter**, blocking automated scrapers (`/api/v1/score` is rate-limited to 10 requests per minute per IP).
-* **Sanitization:** String parser inputs are strictly sanitized via `input_validator.py` to prevent HTML Injection, SQL Injection, and Prompt Injection attacks.
-* **Safe Secrets Storage:** Absolutely zero credentials or API tokens are checked into Git. System configuration relies strictly on environmental context variables, validated at launch by the Flask bootstrap system.
+**Request:**
+```json
+{
+  "question": "Why does Candidate A rank above Candidate B?",
+  "candidate_ids": ["cand_001", "cand_002"]
+}
+```
 
----
+<br>
 
-## 🛠️ Troubleshooting & Common Setup Errors
+## Performance Notes
 
-### 1. `ImportError: cannot import name 'genai' from 'google'`
-* **Cause:** Outdated google-generativeai package or conflicts with the legacy google library.
-* **Resolution:** Run `pip install --upgrade google-genai` to ensure the modern Google GenAI SDK is available.
+**Model Caching** — BGE-large and the XGBoost regressor are loaded once at startup and kept in memory via `model_hub.py`. Subsequent requests skip initialization overhead entirely.
 
-### 2. `OSError: [Errno 99] Cannot assign requested address` (n8n Webhook)
-* **Cause:** The n8n instance is running inside a separate network layer (e.g. Docker) and cannot resolve `localhost:5000` to call the Flask API.
-* **Resolution:** Update your n8n workflow configuration: change `localhost` in HTTP Request nodes to the correct local IP of your host machine (e.g. `192.168.1.5`).
+**Embedding Memoization** — `embedding_cache.py` caches embeddings per resume chunk in memory. On consecutive edits to the same resume, previously embedded chunks are reused, reducing transformer calls significantly for common re-analysis patterns.
 
-### 3. Extremely Slow Local Analysis
-* **Cause:** The machine lacks a GPU, and running `BGE-large-en-v1.5` embeddings on CPU is causing bottlenecks.
-* **Resolution:** In production, ensure PyTorch is compiled with CUDA support. Alternatively, adjust embedding configuration to utilize lightweight models or cloud APIs if preferred.
+**Thread-Safe LLM Throttling** — A global lock (`_gemini_lock`) enforces a 1.5-second minimum interval between Gemini API calls. This prevents concurrent requests from triggering rate limits under normal multi-user load.
 
----
+**Automatic File Pruning** — An APScheduler daemon runs every 6 hours, removing temporary files from `uploads/` and `reports/` to prevent disk accumulation without requiring manual intervention.
 
-## ❓ FAQ
+**Offline Fallback** — If no LLM API keys are configured, the platform runs entirely on local models (spaCy, TF-IDF, XGBoost, FAISS) and returns structured ATS results without any cloud dependency.
 
-#### Q: Does Nexus CV store candidate resumes permanently?
-A: No. Raw PDFs are stored in the gitignored `uploads/` directory during parsing and analysis, and are purged automatically within 6 hours by the cleanup daemon. Only parsed metadata and scores are stored in the SQLite database.
+<br>
 
-#### Q: How does the system handle multi-column resumes?
-A: Standard text extractors often merge columns horizontally, leading to garbled text. Nexus CV uses **pdfplumber** with specialized layout extraction rules to parse text column-by-column, preserving block boundaries.
+## Security
 
-#### Q: Can I run this offline without LLM API keys?
-A: Yes. If no API keys are found in `.env`, the platform steps down automatically to the local fallback chain, running spaCy, TF-IDF, and local XGBoost scoring to generate ATS results without calling cloud services.
+**PII Anonymization** — Before any resume text is sent to an LLM, `bias_filter.py` strips candidate names, precise locations, and personal contact details. This supports unbiased evaluation and reduces data exposure to third-party APIs.
 
----
+**Rate Limiting** — Flask-Limiter restricts the `/api/v1/score` endpoint to 10 requests per minute per IP, mitigating automated scraping and abuse.
 
-## 🗺️ Roadmap
+**Input Sanitization** — All string inputs are processed through `input_validator.py` before reaching service layers, guarding against HTML injection, SQL injection, and prompt injection patterns.
 
-Future enhancements scheduled for active development:
-* [ ] **Cloud-Native Deployment:** Pre-configured Helm Charts and Docker Compose recipes for Kubernetes and Docker Swarm clusters.
-* [ ] **VectorDB Migrations:** Adapters to swap the local FAISS index for high-scale enterprise vector databases (e.g. Qdrant or Pinecone).
-* [ ] **Advanced Recruiter Panel:** Multi-tenant dashboard enabling separate corporate user logins, custom JD templates, and visual hiring pipelines.
-* [ ] **Fine-Tuned Embeddings:** Training BGE-large on a specialized corpus of technical resumes to capture nuanced tech terminology and role semantics.
+**CSRF Protection** — Flask-WTF CSRF tokens are required on all state-changing form submissions.
 
----
+**No Credential Leakage** — All secrets are loaded from environment variables at runtime. Nothing is hardcoded or committed to version control. `.env` is explicitly gitignored.
 
-## 🤝 Contributing
+**Secure Headers** — Response-level security headers are applied globally: XSS protection, HSTS, X-Frame-Options, and Content-Security-Policy.
 
-Contributions to Nexus CV are highly encouraged! Please review [CONTRIBUTING.md](CONTRIBUTING.md) to understand our coding standards, branch conventions, and testing protocols.
+<br>
 
----
+## Future Improvements
 
-## 📄 License
+- [ ] **Docker Compose Setup** — Single-command local deployment for Flask, n8n, and dependencies
+- [ ] **Cloud Deployment Guides** — Railway, Render, and AWS EC2 deployment documentation
+- [ ] **VectorDB Migration** — Adapters to swap FAISS for Qdrant or Pinecone at scale
+- [ ] **Fine-Tuned Embeddings** — Domain-adapted BGE model trained on technical resume corpora
+- [ ] **Multi-Tenant Recruiter Panel** — Separate corporate logins, custom JD templates, pipeline views
+- [ ] **Email Notifications** — Automated alerts for bulk screening completion and score thresholds
+- [ ] **Advanced Analytics Dashboard** — Score trend analysis, skill gap heatmaps, role prediction confidence tracking
+- [ ] **Mobile-Responsive UI** — Full mobile layout optimization
+- [ ] **Resume Version History** — Per-user versioned resume store with diff tracking over time
+- [ ] **Expanded Role Taxonomy** — Broader BART-MNLI classification coverage across more job families
 
-This project is licensed under the terms of the **MIT License**. For details, please consult the [LICENSE](LICENSE) file.
+<br>
 
----
+## Contributing
 
-## 👤 Author
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for branch conventions, coding standards, and testing expectations before submitting a pull request.
 
-Nexus CV is designed, developed, and maintained by **Rohit Posimsetti**.
+**Quick start:**
+```bash
+git checkout -b feature/your-feature-name
+# make your changes
+git commit -m "feat: describe your change"
+git push origin feature/your-feature-name
+# open a Pull Request on GitHub
+```
 
-*Built with passion as an advanced AI/ML portfolio demonstration showcasing production-ready ML architectures, multi-agent systems, and robust full-stack software engineering.*
+<br>
 
----
+## License
+
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+
+<br>
 
 <p align="center">
-  <sub>Developed with ❤️ using Flask, XGBoost, Gemini, FAISS, spaCy, and n8n</sub>
+  Built by <strong>Rohit Posimsetti</strong>
+  <br>
+  <a href="https://github.com/Rohit122622">GitHub</a> · rohit122622@gmail.com
+  <br><br>
+  <sub>Flask · XGBoost · Gemini · FAISS · spaCy · BGE-large · n8n · BART-MNLI</sub>
 </p>
