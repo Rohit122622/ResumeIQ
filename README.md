@@ -1,4 +1,4 @@
-<p align="center">
+<img width="1915" height="1127" alt="image" src="https://github.com/user-attachments/assets/d3929077-046d-4d99-8219-c63258a973f2" /><p align="center">
   <img src="frontend/static/nexuscv-logo.svg" alt="Nexus CV Logo" width="96" height="96">
 </p>
 
@@ -122,70 +122,81 @@ Coming Soon
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1915" height="1127" alt="Screenshot 2026-07-22 173424" src="https://github.com/user-attachments/assets/e01cfd72-745e-4d1f-a3b8-929e12b16a22" />
+
+
 
 ### Dashboard
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1135" alt="Screenshot 2026-07-22 173556" src="https://github.com/user-attachments/assets/f5a85246-536b-4107-8ced-499f8697b944" />
+
 
 ### Resume Analyzer
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1145" alt="Screenshot 2026-07-22 173735" src="https://github.com/user-attachments/assets/bbc72ee6-c2d7-4293-b19c-68d2b6b7e80a" />
+
 
 ### Eligibility / ATS Results
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1138" alt="Screenshot 2026-07-22 173828" src="https://github.com/user-attachments/assets/55d8da36-4c73-437a-aee2-e5b5c5f9f2a1" />
+
 
 ### Recruiter AI Copilot
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1135" alt="Screenshot 2026-07-22 174717" src="https://github.com/user-attachments/assets/27763f93-c0a8-4f4c-8abe-0f37b72a58be" />
+
 
 ### Bulk Screening Portal
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1132" alt="Screenshot 2026-07-22 174804" src="https://github.com/user-attachments/assets/961fd9f6-39a5-4a93-82bb-d6a80340e7db" />
+
 
 ### Resume Comparison
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1916" height="1146" alt="Screenshot 2026-07-22 174240" src="https://github.com/user-attachments/assets/16aa4aae-4cc4-4104-aae6-e21ea85de76d" />
+
 
 ### Career Roadmap
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1128" alt="Screenshot 2026-07-22 173948" src="https://github.com/user-attachments/assets/99c62d2a-57bb-44f9-829c-b825127527c1" />
+
 
 ### PDF Report
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1887" height="1142" alt="Screenshot 2026-07-22 174021" src="https://github.com/user-attachments/assets/d2c88b7f-b39b-45e9-ac18-c1a069fa23df" />
+
 
 ### n8n Workflow
 <p align="center">
 <img src="docs/screenshots/home.png" width="90%">
 </p>
 
-> Add Screenshot Here
+<img width="1917" height="1090" alt="Screenshot 2026-07-22 175751" src="https://github.com/user-attachments/assets/01b35b70-9322-40e1-86a3-c8cb8c7fc9d4" />
+
 
 <br>
 
